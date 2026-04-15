@@ -28,9 +28,7 @@ export RV_API__URL=http://localhost:8080
 ```bash
 riven
 # or
-python -m riven_cli
-# or
-./launch.sh
+python -m src
 ```
 
 ## Session persistence

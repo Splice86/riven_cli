@@ -1,4 +1,4 @@
-"""pyproject.toml for riven_cli package."""
+# pyproject.toml for riven_cli package.
 [project]
 name = "riven-cli"
 version = "0.1.0"
@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [project.scripts]
-riven = "riven_cli.cli:main"
+riven = "src.cli:main"
 
 [build-system]
 requires = ["hatchling"]
