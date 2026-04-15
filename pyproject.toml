@@ -1,0 +1,19 @@
+"""pyproject.toml for riven_cli package."""
+[project]
+name = "riven-cli"
+version = "0.1.0"
+description = "CLI client for Riven API server"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "requests>=2.28.0",
+    "pyyaml>=6.0",
+    "pyfiglet>=0.8",
+]
+
+[project.scripts]
+riven = "riven_cli.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
