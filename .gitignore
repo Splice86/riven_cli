@@ -35,3 +35,6 @@ env/
 # OS
 .DS_Store
 Thumbs.db
+
+# Secrets (local overrides - DO NOT COMMIT)
+secrets.yaml
