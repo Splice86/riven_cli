@@ -1,21 +1,4 @@
-# Memory API Requirements
+# CLI Requirements - lightweight HTTP client for Riven API
 
-# Web server
-fastapi          # FastAPI web framework
-uvicorn          # ASGI server
-
-# Data processing
-numpy            # Numerical operations, array handling
-
-# ML / Embeddings
-torch            # PyTorch for ML models
-sentence-transformers  # Text embeddings
-
-# Token counting
-tiktoken         # OpenAI tokenizer for counting tokens
-
-# Configuration
-pyyaml           # YAML config file parsing
-
-# LLM client
-openai           # OpenAI-compatible API client (for LLM summarization)
+requests>=2.28.0     # HTTP client for API calls
+pyyaml>=6.0          # YAML config parsing
