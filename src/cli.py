@@ -139,9 +139,10 @@ def main():
         sys.exit(1)
     
     # Try to resume saved session, or create new one
-    result = client.resume_session(shard_name="code_hammer")
+    shard = "codehammer"
+    result = client.resume_session(shard_name=shard)
     if not result:
-        result = client.create_session(shard_name="code_hammer")
+        result = client.create_session(shard_name=shard)
         client.save_session()
     
     if not result.get("ok"):
@@ -151,14 +152,14 @@ def main():
     session = result["session_id"]
     resumed = result.get("resumed", False)
     
-    print(f"Using core: code_hammer")
+    print(f"Using core: codehammer")
     if resumed:
         print(f"Session: {session[:8]} (resumed)")
     else:
         print(f"Session: {session[:8]}")
     print("Riven agent ready. Type '/exit' to stop, '/clear' to reset session.\n")
     
-    prompt_prefix = get_prompt_prefix("code_hammer")
+    prompt_prefix = get_prompt_prefix("codehammer")
     
     # Input loop
     try:
@@ -174,7 +175,7 @@ def main():
             if user_input.lower() == '/clear':
                 client.close_session()
                 client.delete_saved_session()
-                result = client.create_session(core_name="code_hammer")
+                result = client.create_session(shard_name=shard)
                 client.save_session()
                 session = result["session_id"]
                 print(f"✓ Session cleared. New session: {session[:8]}")

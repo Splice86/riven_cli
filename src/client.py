@@ -1,4 +1,8 @@
-"""Riven API Client - connects to Riven API server."""
+"""Riven API Client - connects to Riven API server.
+
+For temp_riven: stateless API, session_id sent with each request.
+For riven_core: session-based API with server-side sessions.
+"""
 
 import os
 import uuid
@@ -37,6 +41,7 @@ class RivenClient:
     def __init__(self, base_url: str = None):
         self.base_url = base_url or API_URL
         self.session_id: Optional[str] = None
+        self.shard_name: str = "default"
     
     def list_shards(self) -> List[Dict]:
         """List available shards."""
@@ -45,18 +50,17 @@ class RivenClient:
         return resp.json().get("shards", [])
     
     def create_session(self, shard_name: str = None) -> Dict:
-        """Create a new session with a client-generated session ID."""
-        # Generate session ID on client side
+        """Create a new session with a client-generated session ID.
+        
+        For temp_riven: session_id is generated client-side and sent with each request.
+        No server-side session is created - it's stateless.
+        """
         self.session_id = str(uuid.uuid4())
-        
-        data = {"session_id": self.session_id}
-        if shard_name:
-            data["shard_name"] = shard_name
-        
-        resp = requests.post(f"{self.base_url}/api/v1/sessions", json=data)
-        resp.raise_for_status()
-        result = resp.json()
-        return result
+        return {
+            "session_id": self.session_id,
+            "shard_name": shard_name or "default",
+            "ok": True,
+        }
     
     def send_message(self, message: str, stream: bool = False) -> Dict:
         """Send a message to the current session."""
@@ -64,13 +68,17 @@ class RivenClient:
             raise ValueError("No session - call create_session first")
         
         resp = requests.post(
-            f"{self.base_url}/api/v1/sessions/{self.session_id}/messages",
-            json={"message": message, "stream": stream}
+            f"{self.base_url}/api/v1/messages",
+            json={
+                "message": message,
+                "stream": stream,
+                "session_id": self.session_id,
+                "shard_name": self.shard_name,
+            }
         )
         resp.raise_for_status()
         
         if stream:
-            # Return the raw response for streaming
             return {"stream": True, "response": resp}
         
         return resp.json()
@@ -94,8 +102,13 @@ class RivenClient:
         tool_buffer = ""
         
         with requests.post(
-            f"{self.base_url}/api/v1/sessions/{self.session_id}/messages",
-            json={"message": message, "stream": True},
+            f"{self.base_url}/api/v1/messages",
+            json={
+                "message": message,
+                "stream": True,
+                "session_id": self.session_id,
+                "shard_name": self.shard_name,
+            },
             stream=True,
             timeout=60
         ) as resp:
@@ -167,25 +180,8 @@ class RivenClient:
     
     def poll_messages(self) -> List[str]:
         """Poll for messages from the session."""
-        if not self.session_id:
-            return []
-        
-        try:
-            resp = requests.get(
-                f"{self.base_url}/api/v1/sessions/{self.session_id}/messages",
-                timeout=1
-            )
-            if resp.status_code == 200:
-                return resp.json().get("messages", [])
-        except:
-            pass
+        # Not available in temp_riven's stateless API
         return []
-    
-    def list_sessions(self) -> List[Dict]:
-        """List running sessions."""
-        resp = requests.get(f"{self.base_url}/api/v1/sessions")
-        resp.raise_for_status()
-        return resp.json().get("sessions", [])
     
     def save_session(self) -> None:
         """Save session ID to file for persistence across CLI restarts."""
@@ -215,35 +211,27 @@ class RivenClient:
 
     def close_session(self) -> None:
         """Close the current session."""
-        if self.session_id:
-            try:
-                requests.delete(f"{self.base_url}/api/v1/sessions/{self.session_id}")
-            except:
-                pass
-            self.session_id = None
+        # Stateless API - nothing to close server-side
+        # Just clear local session_id
+        self.session_id = None
 
-    def resume_session(self, shard_name: str = "code_hammer") -> Optional[Dict]:
-        """Try to resume a saved session if it exists on server.
+    def resume_session(self, shard_name: str = "codehammer") -> Optional[Dict]:
+        """Try to resume a saved session.
         
-        Returns session result if successful, None if not.
+        For temp_riven: session_id is client-side only, always resumable.
         """
         saved_id = self.load_session()
         if not saved_id:
             return None
         
-        # Verify session still exists on server
-        if self.session_exists(saved_id):
-            self.session_id = saved_id
-            return {
-                "session_id": saved_id,
-                "shard_name": shard_name,
-                "ok": True,
-                "resumed": True
-            }
-        
-        # Session file exists but session is gone on server (server restart)
-        self.delete_saved_session()
-        return None
+        self.session_id = saved_id
+        self.shard_name = shard_name
+        return {
+            "session_id": saved_id,
+            "shard_name": shard_name,
+            "ok": True,
+            "resumed": True
+        }
 
 
 # ============== CONVENIENCE ==============
