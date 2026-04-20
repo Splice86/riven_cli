@@ -84,7 +84,14 @@ class RivenClient:
         return resp.json()
     
     def stream_message(self, message: str) -> str:
-        """Send message and stream response - prints tokens as they arrive."""
+        """Send message and stream response - prints tokens as they arrive.
+        
+        Event colors:
+        - thinking (grey): reasoning from LLM
+        - tool_call (orange): function call with args
+        - tool_result (green): function result or error
+        - token (cyan): regular text output
+        """
         if not self.session_id:
             raise ValueError("No session - call create_session first")
         
@@ -98,11 +105,6 @@ class RivenClient:
         RESET = "\033[0m"
         
         output = ""
-        in_thinking = False
-        in_tool = False
-        in_result = False
-        tool_buffer = ""
-        result_buffer = ""
         
         with requests.post(
             f"{self.base_url}/api/v1/messages",
@@ -122,7 +124,8 @@ class RivenClient:
                     if line.startswith('data: '):
                         try:
                             data = json.loads(line[6:])
-                            # Handle thinking events - print in dim grey
+                            
+                            # Handle thinking events - grey
                             if 'thinking' in data:
                                 thinking = data.get('thinking', '')
                                 if thinking and thinking.strip():
@@ -130,78 +133,38 @@ class RivenClient:
                                     output += thinking
                                 continue
                             
+                            # Handle tool_call events - orange
+                            if 'tool_call' in data:
+                                tc = data.get('tool_call', {})
+                                args_str = json.dumps(tc.get('arguments', {}), indent=2)
+                                tool_call_str = f"{tc.get('name')}({args_str})"
+                                print(f"\n{ORANGE}{tool_call_str}{RESET}", end="", flush=True)
+                                output += tool_call_str
+                                continue
+                            
+                            # Handle tool_result events - green
+                            if 'tool_result' in data:
+                                tr = data.get('tool_result', {})
+                                error = tr.get('error')
+                                content = tr.get('content', '')
+                                if error:
+                                    result_str = f"[ERROR] {error}"
+                                else:
+                                    result_str = content
+                                print(f"\n{GREEN}{result_str}{RESET}", end="", flush=True)
+                                output += result_str
+                                continue
+                            
+                            # Handle error events
                             if 'error' in data:
                                 print(f"\n{RED}Error: {data['error']}{RESET}")
                                 break
                             
+                            # Handle regular tokens - cyan
                             token = data.get('token', '')
                             if token:
-                                # Print with colors as tokens arrive
-                                while token:
-                                    if in_thinking:
-                                        end = token.find('</think>')
-                                        if end != -1:
-                                            print(f"{GREY}{token[:end]}{RESET}", end="", flush=True)
-                                            output += token[:end]
-                                            token = token[end + 8:]
-                                            in_thinking = False
-                                            print()  # newline after thinking
-                                        else:
-                                            print(f"{GREY}{token}{RESET}", end="", flush=True)
-                                            output += token
-                                            break
-                                    elif in_tool:
-                                        end = token.find('</tool>')
-                                        if end != -1:
-                                            tool_buffer += token[:end]
-                                            token = token[end + 8:]
-                                            print(f"{ORANGE}{tool_buffer}{RESET}", end="", flush=True)
-                                            output += tool_buffer
-                                            tool_buffer = ""
-                                            in_tool = False
-                                            print()  # newline after tool
-                                        else:
-                                            tool_buffer += token
-                                            break
-                                    elif in_result:
-                                        end = token.find('</result>')
-                                        if end != -1:
-                                            result_buffer += token[:end]
-                                            token = token[end + 9:]
-                                            print(f"{GREEN}{result_buffer}{RESET}", end="", flush=True)
-                                            output += result_buffer
-                                            result_buffer = ""
-                                            in_result = False
-                                            print()  # newline after result
-                                        else:
-                                            result_buffer += token
-                                            break
-                                    else:
-                                        start = token.find('<think>')
-                                        if start != -1:
-                                            print(f"{CYAN}{token[:start]}{RESET}", end="", flush=True)
-                                            output += token[:start]
-                                            token = token[start + 7:]
-                                            in_thinking = True
-                                        else:
-                                            start = token.find('<tool>')
-                                            if start != -1:
-                                                print(f"{CYAN}{token[:start]}{RESET}", end="", flush=True)
-                                                output += token[:start]
-                                                token = token[start + 6:]
-                                                in_tool = True
-                                            else:
-                                                # Check for result start
-                                                start = token.find('<result>')
-                                                if start != -1:
-                                                    print(f"{CYAN}{token[:start]}{RESET}", end="", flush=True)
-                                                    output += token[:start]
-                                                    token = token[start + 8:]
-                                                    in_result = True
-                                                else:
-                                                    print(f"{CYAN}{token}{RESET}", end="", flush=True)
-                                                    output += token
-                                                    break
+                                print(f"{CYAN}{token}{RESET}", end="", flush=True)
+                                output += token
                             
                             if data.get('done'):
                                 break

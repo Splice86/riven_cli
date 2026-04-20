@@ -3,7 +3,6 @@
 
 import sys
 import os
-import re
 
 # ANSI colors
 RED = "\033[91m"
@@ -28,16 +27,13 @@ def print_banner():
         result = pyfiglet.figlet_format("RIVEN", font="slant")
         
         # Vertical gradient: dark red -> magenta -> cyan
-        #gradient = [31, 31, 35, 35, 35, 36, 36, 36]  # explicit colors
-        gradient = [31, 91, 35, 95,36]
+        gradient = [31, 91, 35, 95, 36]
         
         lines = result.split('\n')
         nonempty = [l for l in lines if l.strip()]
         num_lines = len(nonempty)
         
         for i, line in enumerate(nonempty):
-            #color_idx = int(i / max(num_lines - 1, 1) * (len(gradient) - 1))
-            #color_idx = min(color_idx, len(gradient) - 1)
             color = gradient[i]
             print(f"\033[{color}m{line}\033[0m")
         
@@ -57,86 +53,6 @@ def get_prompt_prefix(core_name: str) -> str:
 
 def get_session_line(session_id: str) -> str:
     return f"\033[90m[{session_id[:8]}]{RESET}"
-
-
-def print_streamed(text: str):
-    """Print streamed output with colors: grey thinking, orange tools, green results, cyan text."""
-    if not text:
-        return
-    
-    GREY = "\033[90m"
-    ORANGE = "\033[33m"
-    GREEN = "\033[92m"
-    CYAN = "\033[96m"
-    RESET = "\033[0m"
-    
-    in_thinking = False
-    in_tool = False
-    in_result = False
-    tool_buffer = ""
-    result_buffer = ""
-    
-    while text:
-        if in_thinking:
-            end = text.find('</think>')
-            if end != -1:
-                print(f"{GREY}{text[:end]}{RESET}", end="", flush=True)
-                text = text[end + len('</think>'):]
-                in_thinking = False
-                print()  # newline after thinking
-            else:
-                print(f"{GREY}{text}{RESET}", end="", flush=True)
-                break
-        elif in_tool:
-            end = text.find('</tool>')
-            if end != -1:
-                tool_buffer += text[:end]
-                text = text[end + len('</tool>'):]
-                print(f"{ORANGE}{tool_buffer}{RESET}", end="", flush=True)
-                tool_buffer = ""
-                in_tool = False
-                print()  # newline after tool
-            else:
-                tool_buffer += text
-                break
-        elif in_result:
-            end = text.find('</result>')
-            if end != -1:
-                result_buffer += text[:end]
-                text = text[end + len('</result>'):]
-                print(f"{GREEN}{result_buffer}{RESET}", end="", flush=True)
-                result_buffer = ""
-                in_result = False
-                print()  # newline after result
-            else:
-                result_buffer += text
-                break
-        else:
-            # Check for thinking start
-            start = text.find('<think>')
-            if start != -1:
-                print(f"{CYAN}{text[:start]}{RESET}", end="", flush=True)
-                text = text[start + len('<think>'):]
-                in_thinking = True
-            else:
-                # Check for tool start
-                start = text.find('<tool>')
-                if start != -1:
-                    print(f"{CYAN}{text[:start]}{RESET}", end="", flush=True)
-                    text = text[start + len('<tool>'):]
-                    in_tool = True
-                else:
-                    # Check for result start
-                    start = text.find('<result>')
-                    if start != -1:
-                        print(f"{CYAN}{text[:start]}{RESET}", end="", flush=True)
-                        text = text[start + len('<result>'):]
-                        in_result = True
-                    else:
-                        print(f"{CYAN}{text}{RESET}", end="", flush=True)
-                        break
-    
-    print()  # newline at end
 
 
 def main():
