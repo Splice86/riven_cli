@@ -20,6 +20,7 @@ DIM = "\033[2m"
 TEXT_DIM = "\033[2m"
 
 RESET = "\033[0m"
+BOLD = "\033[1m"
 
 # Aliases
 TEXT_BLUE = TEXT_CYAN
@@ -27,19 +28,22 @@ TEXT_ORANGE = TEXT_YELLOW
 TEXT_BLACK = ""
 
 # =============================================================================
-# Background Colors - dark as hell
+# Background Colors - dark as hell (bright bg codes on dark terminal)
 # =============================================================================
 
 BG_BLACK = "\033[40m"        # True black
-BG_DARK_GREY = "\033[100m"   # Dark grey bg
+BG_DARK_GREY = "\033[100m"   # Dark grey
+BG_DARK_BLUE = "\033[44m"    # Dark blue
+BG_DARK_MAGENTA = "\033[45m" # Dark magenta
+BG_DARK_CYAN = "\033[46m"    # Dark cyan
 
 # Aliases
 BG_GREY = BG_DARK_GREY
 BG_RED = BG_BLACK
 BG_YELLOW = BG_DARK_GREY
-BG_BLUE = BG_BLACK
-BG_MAGENTA = BG_BLACK
-BG_CYAN = BG_BLACK
+BG_BLUE = BG_DARK_BLUE
+BG_MAGENTA = BG_DARK_MAGENTA
+BG_CYAN = BG_DARK_CYAN
 BG_WHITE = BG_BLACK
 BG_GREEN = BG_BLACK
 
@@ -51,31 +55,26 @@ SECTIONS = {
     "thinking": {
         "label": "[MIND]",
         "bg": BG_DARK_GREY,
-        "title_color": TEXT_CYAN,
         "content_color": TEXT_WHITE,
     },
     "tool": {
         "label": "[EXEC]",
-        "bg": BG_DARK_GREY,
-        "title_color": TEXT_MAGENTA,
+        "bg": BG_DARK_MAGENTA,
         "content_color": TEXT_WHITE,
     },
     "result": {
         "label": "[DATA]",
-        "bg": BG_BLACK,
-        "title_color": TEXT_YELLOW,
+        "bg": BG_DARK_CYAN,
         "content_color": TEXT_GREEN,
     },
     "riven": {
         "label": "[RIVEN]",
         "bg": BG_BLACK,
-        "title_color": TEXT_CYAN,
         "content_color": TEXT_CYAN,
     },
     "error": {
         "label": "[ERR]",
-        "bg": BG_BLACK,
-        "title_color": TEXT_RED,
+        "bg": BG_DARK_GREY,
         "content_color": TEXT_RED,
     },
 }
@@ -84,12 +83,12 @@ SECTIONS = {
 def section_header(name: str) -> str:
     """Generate a styled section header.
     
-    Returns newline + colored header with background PERSISTING for content.
+    Bold white text on darker colored background.
     """
     if name not in SECTIONS:
         name = "thinking"
     section = SECTIONS[name]
-    return f"\n{section['bg']}{section['title_color']} >> {section['label']}{RESET} "
+    return f"\n{section['bg']}{BOLD}{TEXT_WHITE} {section['label']} {RESET}"
 
 
 def section_content(name: str, text: str) -> str:
