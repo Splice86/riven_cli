@@ -127,46 +127,42 @@ class RivenClient:
                                 if not shown_thinking:
                                     print(styles.section_header("thinking"))
                                     shown_thinking = True
-                                thinking = data.get('thinking', '').strip('
-')
+                                thinking = data.get('thinking', '').strip('\n')
                                 if thinking:
-                                    print(styles.section_content("thinking", thinking), end="", flush=True)
+                                    print(styles.section_content('thinking', thinking), end='', flush=True)
                                     output += thinking
                                 continue
                             
                             # Handle tool_call events
                             if 'tool_call' in data:
                                 if not shown_tool_call:
-                                    print(styles.section_header("tool"))
+                                    print(styles.section_header('tool'))
                                     shown_tool_call = True
                                 tc = data.get('tool_call', {})
                                 args_str = json.dumps(tc.get('arguments', {}), indent=2)
                                 tool_call_str = f"{tc.get('name')}({args_str})"
-                                print(styles.section_content("tool", tool_call_str), end="", flush=True)
+                                print(styles.section_content('tool', tool_call_str), end='', flush=True)
                                 output += tool_call_str
                                 continue
                             
                             # Handle tool_result events
                             if 'tool_result' in data:
                                 if not shown_tool_result:
-                                    print(styles.section_header("result"))
+                                    print(styles.section_header('result'))
                                     shown_tool_result = True
                                 tr = data.get('tool_result', {})
                                 error = tr.get('error')
-                                content = tr.get('content', '').strip('
-')
+                                content = tr.get('content', '').strip('\n')
                                 if error:
                                     result_str = f"[ERROR] {error}"
                                 else:
-                                    # Truncate long output
                                     result_str = styles.truncate_output(content)
-                                print(styles.section_content("result", result_str), end="", flush=True)
+                                print(styles.section_content('result', result_str), end='', flush=True)
                                 output += result_str
                                 continue
                             
                             # Handle regular tokens (final response)
-                            token = data.get('token', '').strip('
-')
+                            token = data.get('token', '').strip('\n')
                             if token:
                                 if not shown_response:
                                     print(styles.section_header("riven"))
