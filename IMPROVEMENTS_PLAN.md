@@ -6,47 +6,33 @@
 
 ## Issues Found (in discovery order)
 
-### 1. ⬜ Duplicated ANSI color constants across 3 files
+### 1. ✅ Duplicated ANSI color constants across 3 files — FIXED
 - **Files**: `cli.py`, `client.py`, `styles.py`
-- **Problem**: `RED`, `RESET`, `CYAN`, `MAGENTA`, `GREEN`, `YELLOW`, `WHITE`, `GREY`, `BOLD`, `DIM` defined in BOTH `cli.py` AND `styles.py`. `client.py` also defines `RED` and `RESET` again.
-- **Fix**: Remove all ANSI codes from `cli.py` and `client.py`. Centralize them in `styles.py`. `cli.py` imports from `src.styles`.
-- **Tests**: Verify no NameErrors after removal
+- **Fix**: Removed ANSI codes from `cli.py` and `client.py`. Centralized in `styles.py`. `cli.py` imports from `src.styles`.
 
-### 2. ⬜ Duplicate `print()` call in `stream_message`
-- **File**: `client.py` line ~the `tool_result` block
-- **Problem**: `print(styles.section_header('result'))` called twice in a row
-- **Fix**: Remove one
-- **Tests**: Verify output still correct
-
-### 3. ⬜ Hardcoded `codehammer` shard name
-- **Files**: `cli.py` (appears ~3 times), `client.py` (in `resume_session` default)
-- **Problem**: Shard name should come from config.yaml, not hardcoded
-- **Fix**: Move `default_shard: codehammer` to `secrets_template.yaml` / `secrets.yaml`, read via `_load_config()`, use in both files
-- **Tests**: Verify CLI still works with configurable shard
-
-### 4. ⬜ Hardcoded `timeout=60` in `stream_message`
+### 2. ✅ Duplicate `print()` call in `stream_message` — FIXED
 - **File**: `client.py`
-- **Problem**: Uses hardcoded 60 instead of `API_TIMEOUT` constant defined 3 lines above
-- **Fix**: Use `API_TIMEOUT` instead
-- **Tests**: Verify still works
+- **Fix**: Removed duplicate `print(styles.section_header('result'))` in tool_result block.
 
-### 5. ⬜ `import json` inside function body
+### 3. ✅ Hardcoded `codehammer` shard name — FIXED
+- **Files**: `cli.py` (3 locations), `client.py` (`resume_session` default)
+- **Fix**: Added `default_shard` to `secrets_template.yaml` / config, read `DEFAULT_SHARD` via `_load_config()`, used in both files.
+
+### 4. ✅ Hardcoded `timeout=60` in `stream_message` — FIXED
+- **File**: `client.py`
+- **Fix**: Replaced with `API_TIMEOUT`.
+
+### 5. ✅ `import json` inside function body — FIXED
 - **File**: `client.py`, inside `stream_message`
-- **Problem**: Should be at module level
-- **Fix**: Move to module-level import
-- **Tests**: Verify still works
+- **Fix**: Moved to module-level import.
 
-### 6. ⬜ `import requests` inside `main()` function body
+### 6. ✅ `import requests` inside `main()` function body — FIXED
 - **File**: `cli.py`, inside `main()`
-- **Problem**: Should be at module level
-- **Fix**: Move to module-level import
-- **Tests**: Verify CLI still boots
+- **Fix**: Moved to module-level import.
 
-### 7. ⬜ Bare `except:` clause in `session_exists`
-- **File**: `client.py`, `session_exists` method
-- **Problem**: Catches ALL exceptions including KeyboardInterrupt, SystemExit
-- **Fix**: Use `except requests.RequestException`
-- **Tests**: Write unit test for this
+### 7. ✅ Bare `except:` clause in `session_exists` — FIXED
+- **File**: `client.py`
+- **Fix**: Replaced with `except requests.RequestException`.
 
 ### 8. ⬜ Double blank line before section header
 - **File**: `client.py`, in `stream_message`
@@ -54,28 +40,34 @@
 - **Fix**: Only print one blank line, not conditional + unconditional
 - **Tests**: Verify output formatting
 
-### 9. ⬜ Duplicate `section_header()` call in tool_result block
-- **File**: `client.py`, tool_result handling in `stream_message`
-- **Problem**: `print(styles.section_header('result'))` called twice consecutively
-- **Fix**: Remove duplicate call
-- **Tests**: Verify
+### 9. ✅ Duplicate `section_header()` call in tool_result block — FIXED (same as #2)
 
-### 10. ⬜ `secrets.yaml` is identical to `secrets_template.yaml`
+### 10. ✅ `secrets.yaml` is identical to `secrets_template.yaml` — FIXED
 - **File**: `secrets.yaml`
-- **Problem**: The actual config file is identical to the template — this means it was likely committed accidentally
-- **Fix**: `secrets.yaml` should contain only actual runtime values (url, timeout, and add default_shard). Template stays as reference.
-- **Tests**: N/A (config only)
+- **Fix**: Updated `secrets.yaml` to contain actual runtime values (url, timeout, default_shard). Template has same `default_shard` key for documentation.
 
-### 11. ⬜ Empty `poll_messages` stub returning []
+### 11. ✅ Empty `poll_messages` stub returning [] — FIXED
 - **File**: `client.py`
-- **Problem**: Stub method that always returns empty list, never called
-- **Fix**: Remove it, or replace with `NotImplementedError` comment
-- **Tests**: Verify nothing breaks
+- **Fix**: Removed orphaned stub.
 
 ---
 
 ## Done
-- (none yet)
+- ✅ Issue #1: ANSI constants consolidated into styles.py
+- ✅ Issue #2: Duplicate print removed
+- ✅ Issue #3: Hardcoded shard name → DEFAULT_SHARD config
+- ✅ Issue #4: Hardcoded timeout → API_TIMEOUT
+- ✅ Issue #5: `import json` moved to module level
+- ✅ Issue #6: `import requests` moved to module level
+- ✅ Issue #7: Bare except replaced
+- ✅ Issue #9: Duplicate print removed (same as #2)
+- ✅ Issue #10: `secrets.yaml` different from template
+- ✅ Issue #11: `poll_messages` stub removed
+- ⬜ Issue #8: Double blank line — remaining (minor UX issue)
+
+## Commits
+- `678323c` refactor: consolidate ANSI codes, move imports to module level, fix bare except
+- `fc2df55` refactor: config-driven shard name, fix hardcoded timeout, remove duplicate print
 
 ## Next Step
 - Fix issue #1: Consolidate ANSI constants into `styles.py`, remove from `cli.py` and `client.py`
