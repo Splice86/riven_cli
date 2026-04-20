@@ -67,7 +67,7 @@ SECTIONS = {
         "label": "[MIND]",
     },
     "tool": {
-        "heading_bg": DARK_YELLOW,
+        "heading_bg": BG_YELLOW,
         "heading_color": WHITE,
         "content_bg": "",
         "content_color": DARK_YELLOW,
