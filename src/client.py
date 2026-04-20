@@ -122,10 +122,13 @@ class RivenClient:
                         try:
                             data = json.loads(line[6:])
                             
-                            # Handle thinking events
+                            # Handle thinking events - only show if still in thinking section
                             if 'thinking' in data:
+                                # Skip thinking once we've moved past it (tool or response shown)
+                                if shown_tool_call or shown_response:
+                                    continue
                                 if not shown_thinking:
-                                    print(styles.section_header("thinking"))
+                                    print(styles.section_header('thinking'))
                                     shown_thinking = True
                                 thinking = data.get('thinking', '').strip('\n')
                                 if thinking:
