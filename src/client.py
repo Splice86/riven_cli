@@ -9,7 +9,7 @@ import uuid
 import yaml
 import requests
 from typing import Optional, List, Dict
-from src import heading as styles
+from src import styles
 
 # ANSI colors
 RED = "\033[91m"
