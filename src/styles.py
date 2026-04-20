@@ -87,14 +87,15 @@ def section_header(name: str) -> str:
 
 
 def section_content(name: str, text: str) -> str:
-    """Color text using section's bg and content_color.
+    """Color text using section's content_color.
     
-    Includes background so content appears on colored background.
+    Background is NOT applied to content - just text color.
+    This keeps tool results/output readable without colored backgrounds.
     """
     if name not in SECTIONS:
         name = "thinking"
     section = SECTIONS[name]
-    return f"{section['bg']}{section['content_color']}{text}{RESET}"
+    return f"{section['content_color']}{text}{RESET}"
 
 
 def section_content(name: str, text: str) -> str:
@@ -124,9 +125,8 @@ def success_text(text: str) -> str:
 # Truncation Config
 # =============================================================================
 
-MAX_LINES = 4           # Max lines to show before truncation
-MAX_LINE_LENGTH = 150   # Max characters per line before truncation
-TRUNCATE_MARKER = f"{TEXT_DIM}{DIM}... [{MAX_LINES} lines truncated, use /expand to see full] ...{RESET}"
+MAX_LINES = 10          # Max lines to show before truncation
+MAX_LINE_LENGTH = 200   # Max characters per line before truncation
 
 
 def truncate_output(text: str) -> str:
@@ -136,7 +136,7 @@ def truncate_output(text: str) -> str:
         text: Raw output text
     
     Returns:
-        Truncated text with marker if truncated, original text otherwise
+        Truncated text if needed, original text otherwise
     """
     lines = text.split('\n')
     
@@ -152,6 +152,6 @@ def truncate_output(text: str) -> str:
             truncated_lines.append(line)
     
     if needs_truncation:
-        return '\n'.join(truncated_lines) + f"\n{TRUNCATE_MARKER}"
+        return '\n'.join(truncated_lines) + "\n... truncated ..."
     
     return text
