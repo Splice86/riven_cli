@@ -21,23 +21,27 @@ TAGLINE = "⬡ ̸S̵I̷G̴N̷A̵L̷S̴ ̷◆̷ ̷IN̶̶ ̵T̷H̷E̴ ̷V̴O̵I̶D
 
 
 def print_banner():
-    """Print cyberpunk ASCII art banner with vertical gradient."""
+    """Print cyberpunk ASCII art banner with horizontal rainbow gradient."""
     try:
         import pyfiglet
         result = pyfiglet.figlet_format("RIVEN", font="slant")
         
-        # Vertical gradient: dark red -> magenta -> cyan
-        gradient = [31, 91, 35, 95, 36]
+        # Cyberpunk rainbow: red -> magenta -> cyan -> green -> yellow
+        rainbow = [91, 95, 96, 92, 93]
         
         lines = result.split('\n')
-        nonempty = [l for l in lines if l.strip()]
-        num_lines = len(nonempty)
+        for line in lines:
+            if line.strip():
+                colored_line = ""
+                for i, char in enumerate(line):
+                    if char != ' ':
+                        color = rainbow[i % len(rainbow)]
+                        colored_line += f"\033[{color}m{char}\033[0m"
+                    else:
+                        colored_line += ' '
+                print(colored_line)
         
-        for i, line in enumerate(nonempty):
-            color = gradient[i]
-            print(f"\033[{color}m{line}\033[0m")
-        
-        print(f"{' ' * 30}\033[91mCODEHAMMER\033[0m")
+        print(f"{' ' * 28}\033[95m◆ CODEHAMMER ◆\033[0m")
         print()
         print(f"{CYAN}┌────────────────────────────────────────┐{RESET}")
         print(f"{CYAN}│{RESET}{MAGENTA}        {TAGLINE}{CYAN}{' ' * 7}{RESET}{CYAN}│{RESET}")
