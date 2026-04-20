@@ -75,22 +75,6 @@ SECTIONS = {
 
 
 def section_header(name: str) -> str:
-    """Generate a styled section header.
-    
-    Args:
-        name: Section name (thinking, tool, result, riven, error)
-    
-    Returns:
-        Formatted header string with newline, background, and label
-    """
-    if name not in SECTIONS:
-        name = "thinking"  # fallback
-    
-    section = SECTIONS[name]
-    return f"\n{section['bg']}{section['text']} ▸ {section['label']} {RESET}"
-
-
-def section_header(name: str) -> str:
     """Generate a styled section header using title_color."""
     if name not in SECTIONS:
         name = "thinking"
