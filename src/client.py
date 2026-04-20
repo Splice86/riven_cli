@@ -86,30 +86,37 @@ class RivenClient:
     def stream_message(self, message: str) -> str:
         """Send message and stream response - prints tokens as they arrive.
         
-        Event colors:
-        - thinking (grey): reasoning from LLM
-        - tool_call (dark orange): function call with args
-        - tool_result (bright orange): function result or error
+        Section headers:
+        - thinking (dim grey): reasoning from LLM
+        - tool_call (magenta): function call with args
+        - tool_result (orange): function result or error
         - token (cyan): regular text output
-        - code blocks: dark background
         """
         if not self.session_id:
             raise ValueError("No session - call create_session first")
         
         import json
-        import re
         
         # ANSI colors
+        DIM = "\033[2m"
         GREY = "\033[90m"
-        MAGENTA = "\033[35m"            # Magenta for tool calls
-        ORANGE = "\033[33m"             # Orange for tool results
+        MAGENTA = "\033[35m"
+        ORANGE = "\033[33m"
         CYAN = "\033[96m"
+        BOLD = "\033[1m"
         RESET = "\033[0m"
         
-        # Code block styling (not currently used but available)
-        # CODE_BG = "\033[48;5;235m"      # Dark grey background
-        # CODE_TEXT = "\033[97m"          # White text
-        # CODE_LANG = "\033[38;5;39m"     # Blue for language label
+        # Section header helper
+        def section_header(label: str, color: str):
+            print(f"{DIM}\n{'─' * 40}{RESET}")
+            print(f"{BOLD}{color}▸ {label}{RESET}")
+            print(f"{DIM}{'─' * 40}{RESET}")
+        
+        # Track which sections we've shown
+        shown_thinking = False
+        shown_tool_call = False
+        shown_tool_result = False
+        shown_response = False
         
         output = ""
         
@@ -134,6 +141,9 @@ class RivenClient:
                             
                             # Handle thinking events - grey
                             if 'thinking' in data:
+                                if not shown_thinking:
+                                    section_header("thinking", GREY)
+                                    shown_thinking = True
                                 thinking = data.get('thinking', '')
                                 if thinking and thinking.strip():
                                     print(f"{GREY}{thinking}{RESET}", end="", flush=True)
@@ -142,6 +152,9 @@ class RivenClient:
                             
                             # Handle tool_call events - magenta
                             if 'tool_call' in data:
+                                if not shown_tool_call:
+                                    section_header("tool call", MAGENTA)
+                                    shown_tool_call = True
                                 tc = data.get('tool_call', {})
                                 args_str = json.dumps(tc.get('arguments', {}), indent=2)
                                 tool_call_str = f"{tc.get('name')}({args_str})"
@@ -151,6 +164,9 @@ class RivenClient:
                             
                             # Handle tool_result events - orange
                             if 'tool_result' in data:
+                                if not shown_tool_result:
+                                    section_header("result", ORANGE)
+                                    shown_tool_result = True
                                 tr = data.get('tool_result', {})
                                 error = tr.get('error')
                                 content = tr.get('content', '')
@@ -167,31 +183,14 @@ class RivenClient:
                                 print(f"\n{RED}Error: {data['error']}{RESET}")
                                 break
                             
-                            # Handle regular tokens - cyan
-                            # Also highlight code blocks with background
+                            # Handle regular tokens - cyan (final response)
                             token = data.get('token', '')
                             if token:
-                                # Check for code blocks
-                                code_pattern = r'(```\w*\n[\s\S]*?```)'
-                                parts = re.split(code_pattern, token)
-                                for part in parts:
-                                    if part.startswith('```'):
-                                        # Extract language and content
-                                        match = re.match(r'```(\w*)\n([\s\S]*?)```', part)
-                                        if match:
-                                            lang = match.group(1) or ''
-                                            code = match.group(2)
-                                            if lang:
-                                                print(f"{CODE_BG}{CODE_LANG}{lang}{RESET}{CODE_BG}{CODE_TEXT}{code}{RESET}", end="", flush=True)
-                                            else:
-                                                print(f"{CODE_BG}{CODE_TEXT}{code}{RESET}", end="", flush=True)
-                                            output += part
-                                        else:
-                                            print(f"{CYAN}{part}{RESET}", end="", flush=True)
-                                            output += part
-                                    else:
-                                        print(f"{CYAN}{part}{RESET}", end="", flush=True)
-                                        output += part
+                                if not shown_response:
+                                    section_header("riven", CYAN)
+                                    shown_response = True
+                                print(f"{CYAN}{token}{RESET}", end="", flush=True)
+                                output += token
                             
                             if data.get('done'):
                                 break
