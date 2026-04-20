@@ -98,17 +98,21 @@ class RivenClient:
         import json
         
         # ANSI colors
-        DIM = "\033[2m"
         GREY = "\033[90m"
         MAGENTA = "\033[35m"
         ORANGE = "\033[33m"
         CYAN = "\033[96m"
-        BOLD = "\033[1m"
         RESET = "\033[0m"
         
-        # Section header helper - single line divider
-        def section_header(label: str, color: str):
-            print(f"\n{DIM}── {BOLD}{color}▸ {label}{RESET} {DIM}───────────────────────────────────────{RESET}")
+        # Colored backgrounds
+        BG_GREY = "\033[100m"
+        BG_MAGENTA = "\033[45m"
+        BG_ORANGE = "\033[43m"
+        BG_CYAN = "\033[46m"
+        
+        # Section header helper - colored background with text
+        def section_header(label: str, bg: str, color: str):
+            print(f"\n{bg}{color} ▸ {label.upper()} {RESET}")
         
         # Track which sections we've shown
         shown_thinking = False
@@ -140,7 +144,7 @@ class RivenClient:
                             # Handle thinking events - grey
                             if 'thinking' in data:
                                 if not shown_thinking:
-                                    section_header("thinking", GREY)
+                                    section_header("thinking", BG_GREY, GREY)
                                     shown_thinking = True
                                 thinking = data.get('thinking', '')
                                 if thinking and thinking.strip():
@@ -151,7 +155,7 @@ class RivenClient:
                             # Handle tool_call events - magenta
                             if 'tool_call' in data:
                                 if not shown_tool_call:
-                                    section_header("tool", MAGENTA)
+                                    section_header("tool", BG_MAGENTA, MAGENTA)
                                     shown_tool_call = True
                                 tc = data.get('tool_call', {})
                                 args_str = json.dumps(tc.get('arguments', {}), indent=2)
@@ -163,7 +167,7 @@ class RivenClient:
                             # Handle tool_result events - orange
                             if 'tool_result' in data:
                                 if not shown_tool_result:
-                                    section_header("result", ORANGE)
+                                    section_header("result", BG_ORANGE, ORANGE)
                                     shown_tool_result = True
                                 tr = data.get('tool_result', {})
                                 error = tr.get('error')
@@ -185,7 +189,7 @@ class RivenClient:
                             token = data.get('token', '')
                             if token:
                                 if not shown_response:
-                                    section_header("riven", CYAN)
+                                    section_header("riven", BG_CYAN, CYAN)
                                     shown_response = True
                                 print(f"{CYAN}{token}{RESET}", end="", flush=True)
                                 output += token
