@@ -126,7 +126,7 @@ class RivenClient:
                             if 'thinking' in data:
                                 if not shown_thinking:
                                     print()
-                                    print(styles.section_header('thinking'), end='')
+                                    print(styles.section_header('thinking'))
                                 shown_thinking = True
                                 thinking = data.get('thinking', '').strip('\n')
                                 if thinking:
@@ -140,7 +140,7 @@ class RivenClient:
                                 shown_thinking = False  # Reset for next turn's thinking
                                 if not shown_tool_result:
                                     print()
-                                    print(styles.section_header('result'), end='')
+                                    print(styles.section_header('result'))
                                 shown_tool_result = True
                                 tr = data.get('tool_result', {})
                                 error = tr.get('error')
@@ -157,7 +157,7 @@ class RivenClient:
                             if 'tool_call' in data:
                                 if not shown_tool_call:
                                     print()
-                                    print(styles.section_header('tool'), end='')
+                                    print(styles.section_header('tool'))
                                 shown_tool_call = True
                                 tc = data.get('tool_call', {})
                                 args_str = json.dumps(tc.get('arguments', {}), indent=2)
@@ -173,7 +173,7 @@ class RivenClient:
                             if token:
                                 if not shown_response:
                                     print()
-                                    print(styles.section_header("riven"), end='')
+                                    print(styles.section_header("riven"))
                                 shown_response = True
                                 print(styles.section_content("riven", token), end="", flush=True)
                                 output += token
