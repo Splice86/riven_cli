@@ -60,18 +60,21 @@ def get_session_line(session_id: str) -> str:
 
 
 def print_streamed(text: str):
-    """Print streamed output with colors: grey thinking, yellow tools, cyan text."""
+    """Print streamed output with colors: grey thinking, orange tools, green results, cyan text."""
     if not text:
         return
     
     GREY = "\033[90m"
-    YELLOW = "\033[93m"
+    ORANGE = "\033[33m"
+    GREEN = "\033[92m"
     CYAN = "\033[96m"
     RESET = "\033[0m"
     
     in_thinking = False
     in_tool = False
+    in_result = False
     tool_buffer = ""
+    result_buffer = ""
     
     while text:
         if in_thinking:
@@ -89,12 +92,24 @@ def print_streamed(text: str):
             if end != -1:
                 tool_buffer += text[:end]
                 text = text[end + len('</tool>'):]
-                print(f"{YELLOW}{tool_buffer}{RESET}", end="", flush=True)
+                print(f"{ORANGE}{tool_buffer}{RESET}", end="", flush=True)
                 tool_buffer = ""
                 in_tool = False
                 print()  # newline after tool
             else:
                 tool_buffer += text
+                break
+        elif in_result:
+            end = text.find('</result>')
+            if end != -1:
+                result_buffer += text[:end]
+                text = text[end + len('</result>'):]
+                print(f"{GREEN}{result_buffer}{RESET}", end="", flush=True)
+                result_buffer = ""
+                in_result = False
+                print()  # newline after result
+            else:
+                result_buffer += text
                 break
         else:
             # Check for thinking start
@@ -111,8 +126,15 @@ def print_streamed(text: str):
                     text = text[start + len('<tool>'):]
                     in_tool = True
                 else:
-                    print(f"{CYAN}{text}{RESET}", end="", flush=True)
-                    break
+                    # Check for result start
+                    start = text.find('<result>')
+                    if start != -1:
+                        print(f"{CYAN}{text[:start]}{RESET}", end="", flush=True)
+                        text = text[start + len('<result>'):]
+                        in_result = True
+                    else:
+                        print(f"{CYAN}{text}{RESET}", end="", flush=True)
+                        break
     
     print()  # newline at end
 

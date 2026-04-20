@@ -92,14 +92,17 @@ class RivenClient:
         
         # ANSI colors
         GREY = "\033[90m"
-        YELLOW = "\033[93m"
+        ORANGE = "\033[33m"
+        GREEN = "\033[92m"
         CYAN = "\033[96m"
         RESET = "\033[0m"
         
         output = ""
         in_thinking = False
         in_tool = False
+        in_result = False
         tool_buffer = ""
+        result_buffer = ""
         
         with requests.post(
             f"{self.base_url}/api/v1/messages",
@@ -119,6 +122,14 @@ class RivenClient:
                     if line.startswith('data: '):
                         try:
                             data = json.loads(line[6:])
+                            # Handle thinking events - print in dim grey
+                            if 'thinking' in data:
+                                thinking = data.get('thinking', '')
+                                if thinking and thinking.strip():
+                                    print(f"{GREY}{thinking}{RESET}", end="", flush=True)
+                                    output += thinking
+                                continue
+                            
                             if 'error' in data:
                                 print(f"\n{RED}Error: {data['error']}{RESET}")
                                 break
@@ -144,13 +155,26 @@ class RivenClient:
                                         if end != -1:
                                             tool_buffer += token[:end]
                                             token = token[end + 8:]
-                                            print(f"{YELLOW}{tool_buffer}{RESET}", end="", flush=True)
+                                            print(f"{ORANGE}{tool_buffer}{RESET}", end="", flush=True)
                                             output += tool_buffer
                                             tool_buffer = ""
                                             in_tool = False
                                             print()  # newline after tool
                                         else:
                                             tool_buffer += token
+                                            break
+                                    elif in_result:
+                                        end = token.find('</result>')
+                                        if end != -1:
+                                            result_buffer += token[:end]
+                                            token = token[end + 9:]
+                                            print(f"{GREEN}{result_buffer}{RESET}", end="", flush=True)
+                                            output += result_buffer
+                                            result_buffer = ""
+                                            in_result = False
+                                            print()  # newline after result
+                                        else:
+                                            result_buffer += token
                                             break
                                     else:
                                         start = token.find('<think>')
@@ -167,9 +191,17 @@ class RivenClient:
                                                 token = token[start + 6:]
                                                 in_tool = True
                                             else:
-                                                print(f"{CYAN}{token}{RESET}", end="", flush=True)
-                                                output += token
-                                                break
+                                                # Check for result start
+                                                start = token.find('<result>')
+                                                if start != -1:
+                                                    print(f"{CYAN}{token[:start]}{RESET}", end="", flush=True)
+                                                    output += token[:start]
+                                                    token = token[start + 8:]
+                                                    in_result = True
+                                                else:
+                                                    print(f"{CYAN}{token}{RESET}", end="", flush=True)
+                                                    output += token
+                                                    break
                             
                             if data.get('done'):
                                 break
