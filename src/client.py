@@ -31,6 +31,7 @@ def _load_config() -> dict:
 CONFIG = _load_config()
 API_URL = CONFIG.get("api", {}).get("url", "http://localhost:8080")
 API_TIMEOUT = CONFIG.get("api", {}).get("timeout", 60)
+DEFAULT_SHARD = CONFIG.get("default_shard", "default")
 
 
 # ============== CLIENT ==============
@@ -41,7 +42,7 @@ class RivenClient:
     def __init__(self, base_url: str = None):
         self.base_url = base_url or API_URL
         self.session_id: Optional[str] = None
-        self.shard_name: str = "default"
+        self.shard_name: str = DEFAULT_SHARD
     
     def list_shards(self) -> List[Dict]:
         """List available shards."""
@@ -110,7 +111,7 @@ class RivenClient:
                 "shard_name": self.shard_name,
             },
             stream=True,
-            timeout=60
+            timeout=API_TIMEOUT
         ) as resp:
             resp.raise_for_status()
             for line in resp.iter_lines():
@@ -141,7 +142,6 @@ class RivenClient:
                                 if not shown_tool_result:
                                     if content_printed:
                                         print()  # blank line before header
-                                    print(styles.section_header('result'))
                                     print(styles.section_header('result'))
                                 shown_tool_result = True
                                 tr = data.get('tool_result', {})
@@ -191,12 +191,7 @@ class RivenClient:
                             pass
         print()  # newline at end
         return output.strip()
-    
-    def poll_messages(self) -> List[str]:
-        """Poll for messages from the session."""
-        # Not available in temp_riven's stateless API
-        return []
-    
+
     def save_session(self) -> None:
         """Save session ID to file for persistence across CLI restarts."""
         if self.session_id:
@@ -229,7 +224,7 @@ class RivenClient:
         # Just clear local session_id
         self.session_id = None
 
-    def resume_session(self, shard_name: str = "codehammer") -> Optional[Dict]:
+    def resume_session(self, shard_name: str = None) -> Optional[Dict]:
         """Try to resume a saved session.
         
         For temp_riven: session_id is client-side only, always resumable.
@@ -239,10 +234,10 @@ class RivenClient:
             return None
         
         self.session_id = saved_id
-        self.shard_name = shard_name
+        self.shard_name = shard_name or DEFAULT_SHARD
         return {
             "session_id": saved_id,
-            "shard_name": shard_name,
+            "shard_name": self.shard_name,
             "ok": True,
             "resumed": True
         }

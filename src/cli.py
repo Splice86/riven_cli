@@ -7,7 +7,7 @@ import os
 import requests
 
 from src import styles
-from src.client import get_client
+from src.client import get_client, DEFAULT_SHARD
 from src.styles import (
     RED, GREEN, YELLOW, MAGENTA, CYAN, WHITE, GREY, RESET, BOLD, DIM,
 )
@@ -71,7 +71,7 @@ def main():
         sys.exit(1)
     
     # Try to resume saved session, or create new one
-    shard = "codehammer"
+    shard = DEFAULT_SHARD
     result = client.resume_session(shard_name=shard)
     if not result:
         result = client.create_session(shard_name=shard)
@@ -84,14 +84,14 @@ def main():
     session = result["session_id"]
     resumed = result.get("resumed", False)
     
-    print(f"Using core: codehammer")
+    print(f"Using core: {shard}")
     if resumed:
         print(f"Session: {session[:8]} (resumed)")
     else:
         print(f"Session: {session[:8]}")
     print("Riven agent ready. Type '/exit' to stop, '/clear' to reset session.\n")
     
-    prompt_prefix = get_prompt_prefix("codehammer")
+    prompt_prefix = get_prompt_prefix(shard)
     
     # Input loop
     try:

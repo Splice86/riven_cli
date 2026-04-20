@@ -17,6 +17,7 @@ with patch.dict(os.environ, {"RIVEN_API_URL": "http://localhost:9999"}):
         SESSION_FILE,
         API_URL,
         API_TIMEOUT,
+        DEFAULT_SHARD,
     )
 
 
@@ -35,10 +36,10 @@ class TestRivenClientInit:
         client = RivenClient(base_url="http://custom:9000")
         assert client.base_url == "http://custom:9000"
 
-    def test_client_shard_name_defaults_to_default(self):
-        """shard_name should default to 'default', not hardcoded value."""
+    def test_client_shard_name_comes_from_default_shard_config(self):
+        """shard_name should come from DEFAULT_SHARD config, not hardcoded."""
         client = RivenClient()
-        assert client.shard_name == "default"
+        assert client.shard_name == DEFAULT_SHARD
 
 
 class TestCreateSession:
@@ -218,6 +219,15 @@ class TestCloseSession:
         assert client.session_id is not None
         client.close_session()
         assert client.session_id is None
+
+
+class TestDefaultShardConfig:
+    """Tests for DEFAULT_SHARD config value."""
+
+    def test_default_shard_is_read_from_config(self):
+        """DEFAULT_SHARD should be a string loaded from config."""
+        assert isinstance(DEFAULT_SHARD, str)
+        assert len(DEFAULT_SHARD) > 0
 
 
 class TestGetClient:
