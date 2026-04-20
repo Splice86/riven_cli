@@ -7,19 +7,31 @@ Dark goth cyberpunk - neon accents on void black.
 # Text Colors
 # =============================================================================
 
+# Bright (good for dark backgrounds)
 WHITE = "\033[97m"
 RED = "\033[91m"
 GREEN = "\033[92m"
 YELLOW = "\033[93m"
+BLUE = "\033[94m"
 CYAN = "\033[96m"
 MAGENTA = "\033[95m"
 
-# Dim/faded
+# Dim/dark
 GREY = "\033[90m"
+DARK_RED = "\033[31m"
+DARK_GREEN = "\033[32m"
+DARK_YELLOW = "\033[33m"
+DARK_BLUE = "\033[34m"
+DARK_MAGENTA = "\033[35m"
+DARK_CYAN = "\033[36m"
+
+# Special
 DIM = "\033[2m"
+BOLD = "\033[1m"
+UNDERLINE = "\033[4m"
+REVERSE = "\033[7m"
 
 RESET = "\033[0m"
-BOLD = "\033[1m"
 
 
 # =============================================================================
