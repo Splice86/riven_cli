@@ -88,21 +88,29 @@ class RivenClient:
         
         Event colors:
         - thinking (grey): reasoning from LLM
-        - tool_call (orange): function call with args
-        - tool_result (green): function result or error
+        - tool_call (dark orange): function call with args
+        - tool_result (bright orange): function result or error
         - token (cyan): regular text output
+        - code blocks: dark background
         """
         if not self.session_id:
             raise ValueError("No session - call create_session first")
         
         import json
+        import re
         
         # ANSI colors
         GREY = "\033[90m"
-        ORANGE = "\033[33m"
+        DARK_ORANGE = "\033[38;5;208m"   # Dark orange for tool calls
+        BRIGHT_ORANGE = "\033[33m"      # Bright orange for results
         GREEN = "\033[92m"
         CYAN = "\033[96m"
         RESET = "\033[0m"
+        
+        # Code block styling
+        CODE_BG = "\033[48;5;235m"      # Dark grey background
+        CODE_TEXT = "\033[97m"          # White text
+        CODE_LANG = "\033[38;5;39m"     # Blue for language label
         
         output = ""
         
@@ -133,16 +141,16 @@ class RivenClient:
                                     output += thinking
                                 continue
                             
-                            # Handle tool_call events - orange
+                            # Handle tool_call events - dark orange
                             if 'tool_call' in data:
                                 tc = data.get('tool_call', {})
                                 args_str = json.dumps(tc.get('arguments', {}), indent=2)
                                 tool_call_str = f"{tc.get('name')}({args_str})"
-                                print(f"\n{ORANGE}{tool_call_str}{RESET}", end="", flush=True)
+                                print(f"{DARK_ORANGE}{tool_call_str}{RESET}", end="", flush=True)
                                 output += tool_call_str
                                 continue
                             
-                            # Handle tool_result events - green
+                            # Handle tool_result events - bright orange
                             if 'tool_result' in data:
                                 tr = data.get('tool_result', {})
                                 error = tr.get('error')
@@ -151,7 +159,7 @@ class RivenClient:
                                     result_str = f"[ERROR] {error}"
                                 else:
                                     result_str = content
-                                print(f"\n{GREEN}{result_str}{RESET}", end="", flush=True)
+                                print(f"{BRIGHT_ORANGE}{result_str}{RESET}", end="", flush=True)
                                 output += result_str
                                 continue
                             
@@ -161,10 +169,30 @@ class RivenClient:
                                 break
                             
                             # Handle regular tokens - cyan
+                            # Also highlight code blocks with background
                             token = data.get('token', '')
                             if token:
-                                print(f"{CYAN}{token}{RESET}", end="", flush=True)
-                                output += token
+                                # Check for code blocks
+                                code_pattern = r'(```\w*\n[\s\S]*?```)'
+                                parts = re.split(code_pattern, token)
+                                for part in parts:
+                                    if part.startswith('```'):
+                                        # Extract language and content
+                                        match = re.match(r'```(\w*)\n([\s\S]*?)```', part)
+                                        if match:
+                                            lang = match.group(1) or ''
+                                            code = match.group(2)
+                                            if lang:
+                                                print(f"{CODE_BG}{CODE_LANG}{lang}{RESET}{CODE_BG}{CODE_TEXT}{code}{RESET}", end="", flush=True)
+                                            else:
+                                                print(f"{CODE_BG}{CODE_TEXT}{code}{RESET}", end="", flush=True)
+                                            output += part
+                                        else:
+                                            print(f"{CYAN}{part}{RESET}", end="", flush=True)
+                                            output += part
+                                    else:
+                                        print(f"{CYAN}{part}{RESET}", end="", flush=True)
+                                        output += part
                             
                             if data.get('done'):
                                 break
