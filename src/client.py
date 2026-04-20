@@ -151,8 +151,10 @@ class RivenClient:
                         if key is None:
                             continue
 
-                        # Print header on key change + non-whitespace content
+                        # Print blank line before header when switching to a new section with real content
                         if key != last_key and raw_content and not raw_content.isspace():
+                            if last_key is not None:
+                                print()  # blank line before new section header
                             print(styles.section_header(key))
                         
                         # Print content
