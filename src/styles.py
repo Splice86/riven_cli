@@ -58,7 +58,7 @@ SECTIONS = {
         "label": "RESULT",
         "bg": BG_YELLOW,
         "title_color": TEXT_BLUE,      # Blue title on yellow
-        "content_color": TEXT_BLACK,   # Black text on yellow (readable)
+        "content_color": TEXT_WHITE,   # White text on yellow - high contrast
     },
     "riven": {
         "label": "RIVEN",
