@@ -78,12 +78,23 @@ SECTIONS = {
 def section_header(name: str) -> str:
     """Generate a styled section header using title_color.
     
-    Returns exactly one newline + colored header.
+    Returns exactly one newline + colored header with background PERSISTING.
     """
     if name not in SECTIONS:
         name = "thinking"
     section = SECTIONS[name]
-    return f"\n{section['bg']}{section['title_color']} ▸ {section['label']}{RESET}"
+    return f"\n{section['bg']}{section['title_color']} ▸ {section['label']}{RESET} "
+
+
+def section_content(name: str, text: str) -> str:
+    """Color text using section's bg and content_color.
+    
+    Includes background so content appears on colored background.
+    """
+    if name not in SECTIONS:
+        name = "thinking"
+    section = SECTIONS[name]
+    return f"{section['bg']}{section['content_color']}{text}{RESET}"
 
 
 def section_content(name: str, text: str) -> str:
