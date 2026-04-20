@@ -14,6 +14,7 @@ TEXT_YELLOW = "\033[93m"     # Bright yellow - warnings
 TEXT_BLUE = "\033[94m"       # Bright blue - links/urls
 TEXT_CYAN = "\033[96m"       # Bright cyan - info
 TEXT_MAGENTA = "\033[95m"    # Bright magenta - highlights
+TEXT_ORANGE = "\033[33m"     # Dark orange - tool results
 
 # Dim/faded colors for subtle elements
 DIM_GREY = "\033[90m"
@@ -58,7 +59,7 @@ SECTIONS = {
         "label": "RESULT",
         "bg": BG_YELLOW,
         "title_color": TEXT_BLUE,      # Blue title on yellow
-        "content_color": TEXT_WHITE,   # White text on yellow - high contrast
+        "content_color": TEXT_ORANGE,  # Dark orange text
     },
     "riven": {
         "label": "RIVEN",
