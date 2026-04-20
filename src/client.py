@@ -127,8 +127,8 @@ class RivenClient:
                                 if not shown_thinking:
                                     print(styles.section_header("thinking"))
                                     shown_thinking = True
-                                thinking = data.get('thinking', '')
-                                if thinking and thinking.strip():
+                                thinking = data.get('thinking', '').strip()
+                                if thinking:
                                     print(styles.section_content("thinking", thinking), end="", flush=True)
                                     output += thinking
                                 continue
@@ -152,7 +152,7 @@ class RivenClient:
                                     shown_tool_result = True
                                 tr = data.get('tool_result', {})
                                 error = tr.get('error')
-                                content = tr.get('content', '')
+                                content = tr.get('content', '').strip()
                                 if error:
                                     result_str = f"[ERROR] {error}"
                                 else:
@@ -163,7 +163,7 @@ class RivenClient:
                                 continue
                             
                             # Handle regular tokens (final response)
-                            token = data.get('token', '')
+                            token = data.get('token', '').strip()
                             if token:
                                 if not shown_response:
                                     print(styles.section_header("riven"))
