@@ -26,8 +26,8 @@ def print_banner():
         import pyfiglet
         result = pyfiglet.figlet_format("RIVEN", font="slant")
         
-        # Vertical gradient: red -> magenta -> cyan (top to bottom)
-        gradient = [91, 91, 91, 35, 35, 35, 36, 36, 36, 96]
+        # Vertical gradient: red -> magenta -> white -> cyan -> bright cyan (top to bottom)
+        gradient = [91, 91, 91, 35, 35, 35, 97, 36, 36, 96]
         
         lines = result.split('\n')
         nonempty = [l for l in lines if l.strip()]
