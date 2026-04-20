@@ -23,60 +23,62 @@ RESET = "\033[0m"
 BOLD = "\033[1m"
 
 # =============================================================================
-# Section Colors - configure heading/content/bg per section
+# Section Colors - heading_bg, content_bg, heading_color, content_color
 # =============================================================================
 
 SECTIONS = {
     "thinking": {
+        "heading_bg": GREY,
         "heading_color": WHITE,
+        "content_bg": "",
         "content_color": CYAN,
-        "bg": GREY,
         "label": "[MIND]",
     },
     "tool": {
+        "heading_bg": MAGENTA,
         "heading_color": WHITE,
+        "content_bg": "",
         "content_color": WHITE,
-        "bg": MAGENTA,
         "label": "[EXEC]",
     },
     "result": {
+        "heading_bg": CYAN,
         "heading_color": WHITE,
+        "content_bg": "",
         "content_color": GREEN,
-        "bg": CYAN,
         "label": "[DATA]",
     },
     "riven": {
+        "heading_bg": "",
         "heading_color": CYAN,
+        "content_bg": "",
         "content_color": WHITE,
-        "bg": BLACK,         # No bg - just neon text
         "label": "[RIVEN]",
     },
     "error": {
-        "heading_color": WHITE,
+        "heading_bg": GREY,
+        "heading_color": RED,
+        "content_bg": "",
         "content_color": RED,
-        "bg": GREY,
         "label": "[ERR]",
     },
 }
 
 
 def section_header(name: str) -> str:
-    """Generate a styled section header.
-
-    Bold white heading on colored bg.
-    """
+    """Generate styled section header with heading_bg and heading_color."""
     if name not in SECTIONS:
         name = "thinking"
     section = SECTIONS[name]
-    return f"\n{section['bg']}{BOLD}{section['heading_color']} {section['label']} {RESET}"
+    return f"\n{section['heading_bg']}{BOLD}{section['heading_color']} {section['label']} {RESET}"
 
 
 def section_content(name: str, text: str) -> str:
-    """Color text using section's content_color."""
+    """Generate styled content with content_bg and content_color."""
     if name not in SECTIONS:
         name = "thinking"
     section = SECTIONS[name]
-    return f"{section['content_color']}{text}{RESET}"
+    return f"{section['content_bg']}{section['content_color']}{text}{RESET}"
 
 
 # =============================================================================
