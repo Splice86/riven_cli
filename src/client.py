@@ -133,20 +133,10 @@ class RivenClient:
                                     output += thinking
                                 continue
                             
-                            # Handle tool_call events
-                            if 'tool_call' in data:
-                                if not shown_tool_call:
-                                    print(styles.section_header('tool'))
-                                    shown_tool_call = True
-                                tc = data.get('tool_call', {})
-                                args_str = json.dumps(tc.get('arguments', {}), indent=2)
-                                tool_call_str = f"{tc.get('name')}({args_str})"
-                                print(styles.section_content('tool', tool_call_str), end='', flush=True)
-                                output += tool_call_str
-                                continue
-                            
-                            # Handle tool_result events
+                            # Handle turn boundary - tool_result signals new turn
+                            # Reset thinking flag so next thinking gets a header
                             if 'tool_result' in data:
+                                shown_thinking = False  # Reset for next turn's thinking
                                 if not shown_tool_result:
                                     print(styles.section_header('result'))
                                     shown_tool_result = True
@@ -160,6 +150,20 @@ class RivenClient:
                                 print(styles.section_content('result', result_str), end='', flush=True)
                                 output += result_str
                                 continue
+                            
+                            # Handle tool_call events
+                            if 'tool_call' in data:
+                                if not shown_tool_call:
+                                    print(styles.section_header('tool'))
+                                    shown_tool_call = True
+                                tc = data.get('tool_call', {})
+                                args_str = json.dumps(tc.get('arguments', {}), indent=2)
+                                tool_call_str = f"{tc.get('name')}({args_str})"
+                                print(styles.section_content('tool', tool_call_str), end='', flush=True)
+                                output += tool_call_str
+                                continue
+                            
+
                             
                             # Handle regular tokens (final response)
                             token = data.get('token', '').strip('\n')
