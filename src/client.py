@@ -4,16 +4,15 @@ For temp_riven: stateless API, session_id sent with each request.
 For riven_core: session-based API with server-side sessions.
 """
 
+import json
 import os
 import uuid
-import yaml
-import requests
-from typing import Optional, List, Dict
-from src import styles
 
-# ANSI colors
-RED = "\033[91m"
-RESET = "\033[0m"
+import requests
+import yaml
+from typing import Optional, List, Dict
+
+from src import styles
 
 # Session file location
 SESSION_FILE = os.path.expanduser("~/.riven_session")
@@ -92,14 +91,13 @@ class RivenClient:
         """
         if not self.session_id:
             raise ValueError("No session - call create_session first")
-        
-        import json
-        
+
         # Track which sections we've shown
         shown_thinking = False
         shown_tool_call = False
         shown_tool_result = False
         shown_response = False
+        content_printed = False  # Track if we've printed content this turn
         
         output = ""
         
@@ -125,13 +123,15 @@ class RivenClient:
                             # Handle thinking events - always show with header
                             if 'thinking' in data:
                                 if not shown_thinking:
-                                    print()
+                                    if content_printed:
+                                        print()  # blank line before header
                                     print(styles.section_header('thinking'))
                                 shown_thinking = True
                                 thinking = data.get('thinking', '').strip('\n')
                                 if thinking:
                                     print(styles.section_content('thinking', thinking), end='', flush=True)
                                     output += thinking
+                                    content_printed = True
                                 continue
                             
                             # Handle turn boundary - tool_result signals new turn
@@ -139,7 +139,9 @@ class RivenClient:
                             if 'tool_result' in data:
                                 shown_thinking = False  # Reset for next turn's thinking
                                 if not shown_tool_result:
-                                    print()
+                                    if content_printed:
+                                        print()  # blank line before header
+                                    print(styles.section_header('result'))
                                     print(styles.section_header('result'))
                                 shown_tool_result = True
                                 tr = data.get('tool_result', {})
@@ -151,12 +153,14 @@ class RivenClient:
                                     result_str = styles.truncate_output(content)
                                 print(styles.section_content('result', result_str), end='', flush=True)
                                 output += result_str
+                                content_printed = True
                                 continue
                             
                             # Handle tool_call events
                             if 'tool_call' in data:
                                 if not shown_tool_call:
-                                    print()
+                                    if content_printed:
+                                        print()  # blank line before header
                                     print(styles.section_header('tool'))
                                 shown_tool_call = True
                                 tc = data.get('tool_call', {})
@@ -164,6 +168,7 @@ class RivenClient:
                                 tool_call_str = f"{tc.get('name')}({args_str})"
                                 print(styles.section_content('tool', tool_call_str), end='', flush=True)
                                 output += tool_call_str
+                                content_printed = True
                                 continue
                             
 
@@ -172,11 +177,13 @@ class RivenClient:
                             token = data.get('token', '').strip('\n')
                             if token:
                                 if not shown_response:
-                                    print()
+                                    if content_printed:
+                                        print()  # blank line before header
                                     print(styles.section_header("riven"))
                                 shown_response = True
                                 print(styles.section_content("riven", token), end="", flush=True)
                                 output += token
+                                content_printed = True
                             
                             if data.get('done'):
                                 break
@@ -213,7 +220,7 @@ class RivenClient:
         try:
             resp = requests.get(f"{self.base_url}/api/v1/sessions/{session_id}")
             return resp.status_code == 200
-        except:
+        except requests.RequestException:
             return False
 
     def close_session(self) -> None:

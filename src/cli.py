@@ -4,18 +4,13 @@
 import sys
 import os
 
-# ANSI colors
-RED = "\033[91m"
-GREEN = "\033[92m"
-YELLOW = "\033[93m"
-MAGENTA = "\033[95m"
-CYAN = "\033[96m"
-WHITE = "\033[97m"
-GREY = "\033[90m"
-RESET = "\033[0m"
+import requests
 
-BOLD = "\033[1m"
-DIM = "\033[2m"
+from src import styles
+from src.client import get_client
+from src.styles import (
+    RED, GREEN, YELLOW, MAGENTA, CYAN, WHITE, GREY, RESET, BOLD, DIM,
+)
 
 TAGLINE = "⬡ ̸S̵I̷G̴N̷A̵L̷S̴ ̷◆̷ ̷IN̶̶ ̵T̷H̷E̴ ̷V̴O̵I̶D̸ ⬡"
 
@@ -54,16 +49,13 @@ def get_prompt_prefix(core_name: str) -> str:
 
 
 def get_session_line(session_id: str) -> str:
-    return f"\033[90m[{session_id[:8]}]{RESET}"
+    return f"{GREY}[{session_id[:8]}]{RESET}"
 
 
 def main():
     """Run CLI."""
     print_banner()
-    
-    from src.client import get_client
-    import requests
-    
+
     client = get_client()
     
     # Check API health
