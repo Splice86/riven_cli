@@ -76,7 +76,10 @@ SECTIONS = {
 
 
 def section_header(name: str) -> str:
-    """Generate a styled section header using title_color."""
+    """Generate a styled section header using title_color.
+    
+    Returns exactly one newline + colored header.
+    """
     if name not in SECTIONS:
         name = "thinking"
     section = SECTIONS[name]
