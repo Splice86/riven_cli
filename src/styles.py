@@ -1,52 +1,47 @@
 """Styling definitions for Riven CLI output.
 
-Dark goth cyberpunk theme - neon accents on void black.
+Dark goth cyberpunk - HIGH CONTRAST neon on void.
 """
 
 # =============================================================================
-# Text Colors (dark goth cyberpunk)
+# Text Colors - bright neon on dark
 # =============================================================================
 
-TEXT_CYAN = "\033[96m"       # Electric cyan - primary neon accent
-TEXT_MAGENTA = "\033[95m"    # Hot magenta - secondary accent
-TEXT_GREEN = "\033[92m"      # Matrix green - success/hacker
+TEXT_CYAN = "\033[96m"       # Bright cyan
+TEXT_MAGENTA = "\033[95m"    # Bright magenta
+TEXT_GREEN = "\033[92m"      # Bright green
+TEXT_YELLOW = "\033[93m"     # Bright yellow
+TEXT_WHITE = "\033[97m"      # Bright white
+TEXT_RED = "\033[91m"        # Bright red
 
 # Dim/faded elements
 DIM_GREY = "\033[90m"
 DIM = "\033[2m"
 TEXT_DIM = "\033[2m"
 
-# Basic reset color (inherit from terminal)
 RESET = "\033[0m"
 
-# Aliases for compatibility
-TEXT_WHITE = TEXT_CYAN      # White-ish cyan for readability
-TEXT_RED = TEXT_MAGENTA     # Goth red
-TEXT_GREEN = TEXT_GREEN
-TEXT_YELLOW = TEXT_GREEN    # Muted green-yellow
-TEXT_BLUE = TEXT_CYAN       # Cyan blues
-TEXT_ORANGE = TEXT_GREEN    # Muted
+# Aliases
+TEXT_BLUE = TEXT_CYAN
+TEXT_ORANGE = TEXT_YELLOW
 TEXT_BLACK = ""
 
 # =============================================================================
-# Background Colors (dark as hell)
+# Background Colors - dark as hell
 # =============================================================================
 
 BG_BLACK = "\033[40m"        # True black
-BG_DARK_GREY = "\033[100m"   # Dark grey - thinking
-BG_DARK_CYAN = "\033[46m"    # Dark cyan - results
-BG_DARK_MAGENTA = "\033[45m" # Dark magenta - tools
-BG_DARK_GREEN = "\033[42m"   # Dark green - riven output
+BG_DARK_GREY = "\033[100m"   # Dark grey bg
 
 # Aliases
 BG_GREY = BG_DARK_GREY
 BG_RED = BG_BLACK
 BG_YELLOW = BG_DARK_GREY
 BG_BLUE = BG_BLACK
-BG_MAGENTA = BG_DARK_MAGENTA
-BG_CYAN = BG_DARK_CYAN
+BG_MAGENTA = BG_BLACK
+BG_CYAN = BG_BLACK
 BG_WHITE = BG_BLACK
-BG_GREEN = BG_DARK_GREEN
+BG_GREEN = BG_BLACK
 
 # =============================================================================
 # Section Definitions - goth cyberpunk labels
@@ -57,31 +52,31 @@ SECTIONS = {
         "label": "[MIND]",
         "bg": BG_DARK_GREY,
         "title_color": TEXT_CYAN,
-        "content_color": TEXT_CYAN,
+        "content_color": TEXT_WHITE,
     },
     "tool": {
         "label": "[EXEC]",
-        "bg": BG_DARK_MAGENTA,
-        "title_color": TEXT_CYAN,
-        "content_color": TEXT_CYAN,
+        "bg": BG_DARK_GREY,
+        "title_color": TEXT_MAGENTA,
+        "content_color": TEXT_WHITE,
     },
     "result": {
         "label": "[DATA]",
-        "bg": BG_DARK_CYAN,
-        "title_color": TEXT_MAGENTA,
+        "bg": BG_BLACK,
+        "title_color": TEXT_YELLOW,
         "content_color": TEXT_GREEN,
     },
     "riven": {
         "label": "[RIVEN]",
-        "bg": BG_DARK_GREEN,
+        "bg": BG_BLACK,
         "title_color": TEXT_CYAN,
         "content_color": TEXT_CYAN,
     },
     "error": {
         "label": "[ERR]",
         "bg": BG_BLACK,
-        "title_color": TEXT_MAGENTA,
-        "content_color": TEXT_MAGENTA,
+        "title_color": TEXT_RED,
+        "content_color": TEXT_RED,
     },
 }
 

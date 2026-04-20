@@ -17,7 +17,7 @@ RESET = "\033[0m"
 BOLD = "\033[1m"
 DIM = "\033[2m"
 
-TAGLINE = "◆ SIGNALS IN THE VOID ◆"
+TAGLINE = "⬡ ̸S̵I̷G̴N̷A̵L̷S̴ ̷◆̷ ̷IN̶̶ ̵T̷H̷E̴ ̷V̴O̵I̶D̸ ⬡"
 
 
 def print_banner():
