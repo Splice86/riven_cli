@@ -106,11 +106,9 @@ class RivenClient:
         BOLD = "\033[1m"
         RESET = "\033[0m"
         
-        # Section header helper
+        # Section header helper - single line divider
         def section_header(label: str, color: str):
-            print(f"{DIM}\n{'─' * 40}{RESET}")
-            print(f"{BOLD}{color}▸ {label}{RESET}")
-            print(f"{DIM}{'─' * 40}{RESET}")
+            print(f"\n{DIM}── {BOLD}{color}▸ {label}{RESET} {DIM}───────────────────────────────────────{RESET}")
         
         # Track which sections we've shown
         shown_thinking = False
@@ -153,7 +151,7 @@ class RivenClient:
                             # Handle tool_call events - magenta
                             if 'tool_call' in data:
                                 if not shown_tool_call:
-                                    section_header("tool call", MAGENTA)
+                                    section_header("tool", MAGENTA)
                                     shown_tool_call = True
                                 tc = data.get('tool_call', {})
                                 args_str = json.dumps(tc.get('arguments', {}), indent=2)
