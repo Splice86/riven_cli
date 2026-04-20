@@ -18,6 +18,7 @@ TEXT_MAGENTA = "\033[95m"    # Bright magenta - highlights
 # Dim/faded colors for subtle elements
 DIM_GREY = "\033[90m"
 DIM = "\033[2m"
+TEXT_DIM = "\033[2m"
 
 TEXT_BLACK = "\033[30m"      # Black text - good on light backgrounds
 
