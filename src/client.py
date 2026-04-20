@@ -185,6 +185,15 @@ class RivenClient:
                                 output += token
                                 content_printed = True
                             
+                            if data.get('context_rebuilt'):
+                                # Next turn starting - reset output state so new headers print
+                                shown_thinking = False
+                                shown_tool_call = False
+                                shown_tool_result = False
+                                shown_response = False
+                                content_printed = False
+                                continue
+
                             if data.get('done'):
                                 break
                         except json.JSONDecodeError:
