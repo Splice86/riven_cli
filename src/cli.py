@@ -26,8 +26,8 @@ def print_banner():
         import pyfiglet
         result = pyfiglet.figlet_format("RIVEN", font="slant")
         
-        # Aggressive cyberpunk gradient: neon red -> hot pink -> neon purple -> electric blue
-        gradient = [91, 91, 95, 95, 34, 34, 94, 96, 96, 96]
+        # Aggressive cyberpunk gradient for 5 lines: neon red -> hot pink -> neon purple -> electric blue -> cyan
+        gradient = [91, 95, 34, 94, 96]
         
         lines = result.split('\n')
         nonempty = [l for l in lines if l.strip()]
