@@ -93,13 +93,7 @@ class RivenClient:
         if not self.session_id:
             raise ValueError("No session - call create_session first")
 
-        # Track which sections we've shown
-        shown_thinking = False
-        shown_tool_call = False
-        shown_tool_result = False
-        shown_response = False
-        content_printed = False  # Track if we've printed content this turn
-        
+        last_key = None
         output = ""
         
         with requests.post(
@@ -120,86 +114,57 @@ class RivenClient:
                     if line.startswith('data: '):
                         try:
                             data = json.loads(line[6:])
-                            
-                            # Handle thinking events - always show with header
-                            if 'thinking' in data:
-                                if not shown_thinking:
-                                    if content_printed:
-                                        print()  # blank line before header
-                                    print(styles.section_header('thinking'))
-                                shown_thinking = True
-                                thinking = data.get('thinking', '')
-                                if thinking:
-                                    print(styles.section_content('thinking', thinking), end='', flush=True)
-                                    output += thinking
-                                    content_printed = True
-                                continue
-                            
-                            # Handle turn boundary - tool_result signals new turn
-                            # Reset thinking flag so next thinking gets a header
-                            if 'tool_result' in data:
-                                shown_thinking = False  # Reset for next turn's thinking
-                                if not shown_tool_result:
-                                    if content_printed:
-                                        print()  # blank line before header
-                                    print(styles.section_header('result'))
-                                shown_tool_result = True
-                                tr = data.get('tool_result', {})
-                                error = tr.get('error')
-                                content = tr.get('content', '')
-                                if error:
-                                    result_str = f"[ERROR] {error}"
-                                else:
-                                    result_str = styles.truncate_output(content)
-                                print(styles.section_content('result', result_str), end='', flush=True)
-                                output += result_str
-                                content_printed = True
-                                continue
-                            
-                            # Handle tool_call events
-                            if 'tool_call' in data:
-                                if not shown_tool_call:
-                                    if content_printed:
-                                        print()  # blank line before header
-                                    print(styles.section_header('tool'))
-                                shown_tool_call = True
-                                tc = data.get('tool_call', {})
-                                args_str = json.dumps(tc.get('arguments', {}), indent=2)
-                                tool_call_str = f"{tc.get('name')}({args_str})"
-                                print(styles.section_content('tool', tool_call_str), end='', flush=True)
-                                output += tool_call_str
-                                content_printed = True
-                                continue
-                            
-
-                            
-                            # Handle regular tokens (final response)
-                            token = data.get('token', '')
-                            if token:
-                                if not shown_response:
-                                    if content_printed:
-                                        print()  # blank line before header
-                                    print(styles.section_header("riven"))
-                                shown_response = True
-                                print(styles.section_content("riven", token), end="", flush=True)
-                                output += token
-                                content_printed = True
-                            
-                            if data.get('context_rebuilt'):
-                                # Next turn starting - reset output state so new headers print
-                                shown_thinking = False
-                                shown_tool_call = False
-                                shown_tool_result = False
-                                shown_response = False
-                                content_printed = False
-                                continue
-
-                            if data.get('done'):
-                                break
                         except json.JSONDecodeError:
-                            pass
+                            continue
+
+                        # New turn starting - reset so headers re-print
+                        if data.get('context_rebuilt'):
+                            last_key = None
+                            continue
+
+                        if data.get('done'):
+                            break
+
+                        # Determine which key this event belongs to
+                        key = None
+                        raw_content = ""
+                        
+                        if 'thinking' in data:
+                            key = 'thinking'
+                            raw_content = data.get('thinking', '')
+                        elif 'tool_call' in data:
+                            key = 'tool'
+                            tc = data.get('tool_call', {})
+                            args_str = json.dumps(tc.get('arguments', {}), indent=2)
+                            raw_content = f"{tc.get('name')}({args_str})"
+                        elif 'tool_result' in data:
+                            key = 'result'
+                            tr = data.get('tool_result', {})
+                            if tr.get('error'):
+                                raw_content = f"[ERROR] {tr.get('error')}"
+                            else:
+                                raw_content = styles.truncate_output(tr.get('content', ''))
+                        elif 'token' in data:
+                            key = 'riven'
+                            raw_content = data.get('token', '')
+
+                        if key is None:
+                            continue
+
+                        # Print header on key change + non-whitespace content
+                        if key != last_key and raw_content and not raw_content.isspace():
+                            print(styles.section_header(key))
+                        
+                        # Print content
+                        if raw_content:
+                            print(styles.section_content(key, raw_content), end='', flush=True)
+                            output += raw_content
+
+                        if raw_content and not raw_content.isspace():
+                            last_key = key
+
         print()  # newline at end
-        return output.strip()
+        return output
 
     def save_session(self) -> None:
         """Save session ID to file for persistence across CLI restarts."""
@@ -229,15 +194,10 @@ class RivenClient:
 
     def close_session(self) -> None:
         """Close the current session."""
-        # Stateless API - nothing to close server-side
-        # Just clear local session_id
         self.session_id = None
 
     def resume_session(self, shard_name: str = None) -> Optional[Dict]:
-        """Try to resume a saved session.
-        
-        For temp_riven: session_id is client-side only, always resumable.
-        """
+        """Try to resume a saved session."""
         saved_id = self.load_session()
         if not saved_id:
             return None
