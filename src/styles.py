@@ -1,94 +1,74 @@
 """Styling definitions for Riven CLI output.
 
-Dark goth cyberpunk - HIGH CONTRAST neon on void.
+Dark goth cyberpunk - neon accents on void black.
 """
 
 # =============================================================================
-# Text Colors - bright neon on dark
+# Text Colors
 # =============================================================================
 
-TEXT_CYAN = "\033[96m"       # Bright cyan
-TEXT_MAGENTA = "\033[95m"    # Bright magenta
-TEXT_GREEN = "\033[92m"      # Bright green
-TEXT_YELLOW = "\033[93m"     # Bright yellow
-TEXT_WHITE = "\033[97m"      # Bright white
-TEXT_RED = "\033[91m"        # Bright red
+BLACK = ""
+WHITE = "\033[97m"
+RED = "\033[91m"
+GREEN = "\033[92m"
+YELLOW = "\033[93m"
+CYAN = "\033[96m"
+MAGENTA = "\033[95m"
 
-# Dim/faded elements
-DIM_GREY = "\033[90m"
+# Dim/faded
+GREY = "\033[90m"
 DIM = "\033[2m"
-TEXT_DIM = "\033[2m"
 
 RESET = "\033[0m"
 BOLD = "\033[1m"
 
-# Aliases
-TEXT_BLUE = TEXT_CYAN
-TEXT_ORANGE = TEXT_YELLOW
-TEXT_BLACK = ""
-
 # =============================================================================
-# Background Colors - dark as hell (bright bg codes on dark terminal)
-# =============================================================================
-
-BG_BLACK = "\033[40m"        # True black
-BG_DARK_GREY = "\033[100m"   # Dark grey
-BG_DARK_BLUE = "\033[44m"    # Dark blue
-BG_DARK_MAGENTA = "\033[45m" # Dark magenta
-BG_DARK_CYAN = "\033[46m"    # Dark cyan
-
-# Aliases
-BG_GREY = BG_DARK_GREY
-BG_RED = BG_BLACK
-BG_YELLOW = BG_DARK_GREY
-BG_BLUE = BG_DARK_BLUE
-BG_MAGENTA = BG_DARK_MAGENTA
-BG_CYAN = BG_DARK_CYAN
-BG_WHITE = BG_BLACK
-BG_GREEN = BG_BLACK
-
-# =============================================================================
-# Section Definitions - goth cyberpunk labels
+# Section Colors - configure heading/content/bg per section
 # =============================================================================
 
 SECTIONS = {
     "thinking": {
+        "heading_color": WHITE,
+        "content_color": CYAN,
+        "bg": GREY,
         "label": "[MIND]",
-        "bg": BG_DARK_GREY,
-        "content_color": TEXT_WHITE,
     },
     "tool": {
+        "heading_color": WHITE,
+        "content_color": WHITE,
+        "bg": MAGENTA,
         "label": "[EXEC]",
-        "bg": BG_DARK_MAGENTA,
-        "content_color": TEXT_WHITE,
     },
     "result": {
+        "heading_color": WHITE,
+        "content_color": GREEN,
+        "bg": CYAN,
         "label": "[DATA]",
-        "bg": BG_DARK_CYAN,
-        "content_color": TEXT_GREEN,
     },
     "riven": {
+        "heading_color": CYAN,
+        "content_color": WHITE,
+        "bg": BLACK,         # No bg - just neon text
         "label": "[RIVEN]",
-        "bg": BG_BLACK,
-        "content_color": TEXT_CYAN,
     },
     "error": {
+        "heading_color": WHITE,
+        "content_color": RED,
+        "bg": GREY,
         "label": "[ERR]",
-        "bg": BG_DARK_GREY,
-        "content_color": TEXT_RED,
     },
 }
 
 
 def section_header(name: str) -> str:
     """Generate a styled section header.
-    
-    Bold white text on darker colored background.
+
+    Bold white heading on colored bg.
     """
     if name not in SECTIONS:
         name = "thinking"
     section = SECTIONS[name]
-    return f"\n{section['bg']}{BOLD}{TEXT_WHITE} {section['label']} {RESET}"
+    return f"\n{section['bg']}{BOLD}{section['heading_color']} {section['label']} {RESET}"
 
 
 def section_content(name: str, text: str) -> str:
@@ -99,43 +79,20 @@ def section_content(name: str, text: str) -> str:
     return f"{section['content_color']}{text}{RESET}"
 
 
-def colored_text(text: str, color: str) -> str:
-    """Wrap text in a color."""
-    return f"{color}{text}{RESET}"
-
-
-def error_text(text: str) -> str:
-    """Format error text."""
-    return f"{TEXT_RED}{text}{RESET}"
-
-
-def success_text(text: str) -> str:
-    """Format success text."""
-    return f"{TEXT_GREEN}{text}{RESET}"
-
-
 # =============================================================================
 # Truncation Config
 # =============================================================================
 
-MAX_LINES = 10          # Max lines to show before truncation
-MAX_LINE_LENGTH = 200   # Max characters per line before truncation
+MAX_LINES = 10
+MAX_LINE_LENGTH = 200
 
 
 def truncate_output(text: str) -> str:
-    """Truncate output to MAX_LINES lines and MAX_LINE_LENGTH chars per line.
-    
-    Args:
-        text: Raw output text
-    
-    Returns:
-        Truncated text if needed, original text otherwise
-    """
+    """Truncate output to MAX_LINES lines and MAX_LINE_LENGTH chars."""
     lines = text.split('\n')
-    
-    # Check if truncation needed
+
     needs_truncation = len(lines) > MAX_LINES
-    
+
     truncated_lines = []
     for line in lines[:MAX_LINES]:
         if len(line) > MAX_LINE_LENGTH:
@@ -143,8 +100,7 @@ def truncate_output(text: str) -> str:
             needs_truncation = True
         else:
             truncated_lines.append(line)
-    
+
     if needs_truncation:
         return '\n'.join(truncated_lines) + "\n... truncated ..."
-    
     return text
