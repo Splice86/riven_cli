@@ -102,10 +102,6 @@ class RivenClient:
         shown_response = False
         
         output = ""
-        shown_tool_result = False
-        shown_response = False
-        
-        output = ""
         
         with requests.post(
             f"{self.base_url}/api/v1/messages",
@@ -172,11 +168,6 @@ class RivenClient:
                                     print(styles.section_header("riven"))
                                     shown_response = True
                                 print(styles.section_content("riven", token), end="", flush=True)
-                                output += token
-                                if not shown_response:
-                                    section_header("riven", BG_CYAN, CYAN)
-                                    shown_response = True
-                                print(f"{CYAN}{token}{RESET}", end="", flush=True)
                                 output += token
                             
                             if data.get('done'):
