@@ -103,3 +103,40 @@ def error_text(text: str) -> str:
 def success_text(text: str) -> str:
     """Format success text."""
     return f"{TEXT_GREEN}{text}{RESET}"
+
+
+# =============================================================================
+# Truncation Config
+# =============================================================================
+
+MAX_LINES = 4           # Max lines to show before truncation
+MAX_LINE_LENGTH = 150   # Max characters per line before truncation
+TRUNCATE_MARKER = f"{TEXT_DIM}{DIM}... [{MAX_LINES} lines truncated, use /expand to see full] ...{RESET}"
+
+
+def truncate_output(text: str) -> str:
+    """Truncate output to MAX_LINES lines and MAX_LINE_LENGTH chars per line.
+    
+    Args:
+        text: Raw output text
+    
+    Returns:
+        Truncated text with marker if truncated, original text otherwise
+    """
+    lines = text.split('\n')
+    
+    # Check if truncation needed
+    needs_truncation = len(lines) > MAX_LINES
+    
+    truncated_lines = []
+    for line in lines[:MAX_LINES]:
+        if len(line) > MAX_LINE_LENGTH:
+            truncated_lines.append(line[:MAX_LINE_LENGTH])
+            needs_truncation = True
+        else:
+            truncated_lines.append(line)
+    
+    if needs_truncation:
+        return '\n'.join(truncated_lines) + f"\n{TRUNCATE_MARKER}"
+    
+    return text

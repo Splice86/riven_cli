@@ -156,7 +156,8 @@ class RivenClient:
                                 if error:
                                     result_str = f"[ERROR] {error}"
                                 else:
-                                    result_str = content
+                                    # Truncate long output
+                                    result_str = styles.truncate_output(content)
                                 print(styles.section_content("result", result_str), end="", flush=True)
                                 output += result_str
                                 continue
