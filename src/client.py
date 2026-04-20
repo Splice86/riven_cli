@@ -101,16 +101,15 @@ class RivenClient:
         
         # ANSI colors
         GREY = "\033[90m"
-        DARK_ORANGE = "\033[38;5;208m"   # Dark orange for tool calls
-        BRIGHT_ORANGE = "\033[33m"      # Bright orange for results
-        GREEN = "\033[92m"
+        MAGENTA = "\033[35m"            # Magenta for tool calls
+        ORANGE = "\033[33m"             # Orange for tool results
         CYAN = "\033[96m"
         RESET = "\033[0m"
         
-        # Code block styling
-        CODE_BG = "\033[48;5;235m"      # Dark grey background
-        CODE_TEXT = "\033[97m"          # White text
-        CODE_LANG = "\033[38;5;39m"     # Blue for language label
+        # Code block styling (not currently used but available)
+        # CODE_BG = "\033[48;5;235m"      # Dark grey background
+        # CODE_TEXT = "\033[97m"          # White text
+        # CODE_LANG = "\033[38;5;39m"     # Blue for language label
         
         output = ""
         
@@ -141,16 +140,16 @@ class RivenClient:
                                     output += thinking
                                 continue
                             
-                            # Handle tool_call events - dark orange
+                            # Handle tool_call events - magenta
                             if 'tool_call' in data:
                                 tc = data.get('tool_call', {})
                                 args_str = json.dumps(tc.get('arguments', {}), indent=2)
                                 tool_call_str = f"{tc.get('name')}({args_str})"
-                                print(f"{DARK_ORANGE}{tool_call_str}{RESET}", end="", flush=True)
+                                print(f"{MAGENTA}{tool_call_str}{RESET}", end="", flush=True)
                                 output += tool_call_str
                                 continue
                             
-                            # Handle tool_result events - bright orange
+                            # Handle tool_result events - orange
                             if 'tool_result' in data:
                                 tr = data.get('tool_result', {})
                                 error = tr.get('error')
@@ -159,7 +158,7 @@ class RivenClient:
                                     result_str = f"[ERROR] {error}"
                                 else:
                                     result_str = content
-                                print(f"{BRIGHT_ORANGE}{result_str}{RESET}", end="", flush=True)
+                                print(f"{ORANGE}{result_str}{RESET}", end="", flush=True)
                                 output += result_str
                                 continue
                             
