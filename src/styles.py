@@ -67,7 +67,7 @@ SECTIONS = {
         "label": "[MIND]",
     },
     "tool": {
-        "heading_bg": BG_DARK_MAGENTA,
+        "heading_bg": DARK_YELLOW,
         "heading_color": WHITE,
         "content_bg": "",
         "content_color": DARK_YELLOW,
@@ -81,7 +81,7 @@ SECTIONS = {
         "label": "[DATA]",
     },
     "riven": {
-        "heading_bg": BG_DARK_BLUE,
+        "heading_bg": BG_DARK_CYAN,
         "heading_color": WHITE,
         "content_bg": "",
         "content_color": DARK_CYAN,
@@ -102,7 +102,7 @@ def section_header(name: str) -> str:
     if name not in SECTIONS:
         name = "thinking"
     section = SECTIONS[name]
-    return f"\n{section['heading_bg']}{BOLD}{section['heading_color']} {section['label']} {RESET}"
+    return f"{section['heading_bg']}{BOLD}{section['heading_color']} {section['label']} {RESET}"
 
 
 def section_content(name: str, text: str) -> str:

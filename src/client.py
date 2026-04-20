@@ -125,7 +125,8 @@ class RivenClient:
                             # Handle thinking events - always show with header
                             if 'thinking' in data:
                                 if not shown_thinking:
-                                    print(styles.section_header('thinking'))
+                                    print()
+                                    print(styles.section_header('thinking'), end='')
                                 shown_thinking = True
                                 thinking = data.get('thinking', '').strip('\n')
                                 if thinking:
@@ -138,8 +139,9 @@ class RivenClient:
                             if 'tool_result' in data:
                                 shown_thinking = False  # Reset for next turn's thinking
                                 if not shown_tool_result:
-                                    print(styles.section_header('result'))
-                                    shown_tool_result = True
+                                    print()
+                                    print(styles.section_header('result'), end='')
+                                shown_tool_result = True
                                 tr = data.get('tool_result', {})
                                 error = tr.get('error')
                                 content = tr.get('content', '').strip('\n')
@@ -154,8 +156,9 @@ class RivenClient:
                             # Handle tool_call events
                             if 'tool_call' in data:
                                 if not shown_tool_call:
-                                    print(styles.section_header('tool'))
-                                    shown_tool_call = True
+                                    print()
+                                    print(styles.section_header('tool'), end='')
+                                shown_tool_call = True
                                 tc = data.get('tool_call', {})
                                 args_str = json.dumps(tc.get('arguments', {}), indent=2)
                                 tool_call_str = f"{tc.get('name')}({args_str})"
@@ -169,8 +172,9 @@ class RivenClient:
                             token = data.get('token', '').strip('\n')
                             if token:
                                 if not shown_response:
-                                    print(styles.section_header("riven"))
-                                    shown_response = True
+                                    print()
+                                    print(styles.section_header("riven"), end='')
+                                shown_response = True
                                 print(styles.section_content("riven", token), end="", flush=True)
                                 output += token
                             
