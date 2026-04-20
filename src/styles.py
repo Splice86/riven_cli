@@ -1,102 +1,100 @@
 """Styling definitions for Riven CLI output.
 
-Centralized color/style definitions for consistent terminal output.
+Dark goth cyberpunk theme - neon accents on void black.
 """
 
 # =============================================================================
-# Text Colors (bright, readable on dark backgrounds)
+# Text Colors (dark goth cyberpunk)
 # =============================================================================
 
-TEXT_WHITE = "\033[97m"      # Bright white - primary text on colored backgrounds
-TEXT_RED = "\033[91m"        # Bright red - errors
-TEXT_GREEN = "\033[92m"      # Bright green - success
-TEXT_YELLOW = "\033[93m"     # Bright yellow - warnings
-TEXT_BLUE = "\033[94m"       # Bright blue - links/urls
-TEXT_CYAN = "\033[96m"       # Bright cyan - info
-TEXT_MAGENTA = "\033[95m"    # Bright magenta - highlights
-TEXT_ORANGE = "\033[33m"     # Dark orange - tool results
+TEXT_CYAN = "\033[96m"       # Electric cyan - primary neon accent
+TEXT_MAGENTA = "\033[95m"    # Hot magenta - secondary accent
+TEXT_GREEN = "\033[92m"      # Matrix green - success/hacker
 
-# Dim/faded colors for subtle elements
+# Dim/faded elements
 DIM_GREY = "\033[90m"
 DIM = "\033[2m"
 TEXT_DIM = "\033[2m"
 
-TEXT_BLACK = "\033[30m"      # Black text - good on light backgrounds
-
+# Basic reset color (inherit from terminal)
 RESET = "\033[0m"
 
-# =============================================================================
-# Background Colors
-# =============================================================================
-
-BG_GREY = "\033[100m"        # Dark grey background
-BG_RED = "\033[41m"          # Red background
-BG_GREEN = "\033[42m"        # Green background
-BG_YELLOW = "\033[43m"       # Yellow background
-BG_BLUE = "\033[44m"         # Blue background
-BG_MAGENTA = "\033[45m"      # Magenta background
-BG_CYAN = "\033[46m"         # Cyan background
-BG_WHITE = "\033[47m"        # White background
+# Aliases for compatibility
+TEXT_WHITE = TEXT_CYAN      # White-ish cyan for readability
+TEXT_RED = TEXT_MAGENTA     # Goth red
+TEXT_GREEN = TEXT_GREEN
+TEXT_YELLOW = TEXT_GREEN    # Muted green-yellow
+TEXT_BLUE = TEXT_CYAN       # Cyan blues
+TEXT_ORANGE = TEXT_GREEN    # Muted
+TEXT_BLACK = ""
 
 # =============================================================================
-# Section Definitions
+# Background Colors (dark as hell)
+# =============================================================================
+
+BG_BLACK = "\033[40m"        # True black
+BG_DARK_GREY = "\033[100m"   # Dark grey - thinking
+BG_DARK_CYAN = "\033[46m"    # Dark cyan - results
+BG_DARK_MAGENTA = "\033[45m" # Dark magenta - tools
+BG_DARK_GREEN = "\033[42m"   # Dark green - riven output
+
+# Aliases
+BG_GREY = BG_DARK_GREY
+BG_RED = BG_BLACK
+BG_YELLOW = BG_DARK_GREY
+BG_BLUE = BG_BLACK
+BG_MAGENTA = BG_DARK_MAGENTA
+BG_CYAN = BG_DARK_CYAN
+BG_WHITE = BG_BLACK
+BG_GREEN = BG_DARK_GREEN
+
+# =============================================================================
+# Section Definitions - goth cyberpunk labels
 # =============================================================================
 
 SECTIONS = {
     "thinking": {
-        "label": "THINKING",
-        "bg": BG_GREY,
-        "title_color": TEXT_WHITE,
-        "content_color": TEXT_WHITE,
+        "label": "[MIND]",
+        "bg": BG_DARK_GREY,
+        "title_color": TEXT_CYAN,
+        "content_color": TEXT_CYAN,
     },
     "tool": {
-        "label": "TOOL",
-        "bg": BG_MAGENTA,
-        "title_color": TEXT_WHITE,
-        "content_color": TEXT_WHITE,
+        "label": "[EXEC]",
+        "bg": BG_DARK_MAGENTA,
+        "title_color": TEXT_CYAN,
+        "content_color": TEXT_CYAN,
     },
     "result": {
-        "label": "RESULT",
-        "bg": BG_YELLOW,
-        "title_color": TEXT_BLUE,      # Blue title on yellow
-        "content_color": TEXT_ORANGE,  # Dark orange text
+        "label": "[DATA]",
+        "bg": BG_DARK_CYAN,
+        "title_color": TEXT_MAGENTA,
+        "content_color": TEXT_GREEN,
     },
     "riven": {
-        "label": "RIVEN",
-        "bg": BG_CYAN,
-        "title_color": TEXT_WHITE,
-        "content_color": TEXT_CYAN,    # Cyan content text
+        "label": "[RIVEN]",
+        "bg": BG_DARK_GREEN,
+        "title_color": TEXT_CYAN,
+        "content_color": TEXT_CYAN,
     },
     "error": {
-        "label": "ERROR",
-        "bg": BG_RED,
-        "title_color": TEXT_WHITE,
-        "content_color": TEXT_WHITE,
+        "label": "[ERR]",
+        "bg": BG_BLACK,
+        "title_color": TEXT_MAGENTA,
+        "content_color": TEXT_MAGENTA,
     },
 }
 
 
 def section_header(name: str) -> str:
-    """Generate a styled section header using title_color.
+    """Generate a styled section header.
     
-    Returns exactly one newline + colored header with background PERSISTING.
+    Returns newline + colored header with background PERSISTING for content.
     """
     if name not in SECTIONS:
         name = "thinking"
     section = SECTIONS[name]
-    return f"\n{section['bg']}{section['title_color']} ▸ {section['label']}{RESET} "
-
-
-def section_content(name: str, text: str) -> str:
-    """Color text using section's content_color.
-    
-    Background is NOT applied to content - just text color.
-    This keeps tool results/output readable without colored backgrounds.
-    """
-    if name not in SECTIONS:
-        name = "thinking"
-    section = SECTIONS[name]
-    return f"{section['content_color']}{text}{RESET}"
+    return f"\n{section['bg']}{section['title_color']} >> {section['label']}{RESET} "
 
 
 def section_content(name: str, text: str) -> str:

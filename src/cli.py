@@ -17,7 +17,7 @@ RESET = "\033[0m"
 BOLD = "\033[1m"
 DIM = "\033[2m"
 
-TAGLINE = "⬡ ̸S̵I̷G̴N̷A̵L̷S̴ ̷◆̷ ̷IN̶̶ ̵T̷H̷E̴ ̷V̴O̵I̶D̸ ⬡"
+TAGLINE = "◆ SIGNALS IN THE VOID ◆"
 
 
 def print_banner():
@@ -27,7 +27,7 @@ def print_banner():
         result = pyfiglet.figlet_format("RIVEN", font="slant")
         
         # Aggressive cyberpunk gradient for 5 lines: neon red -> hot pink -> neon purple -> electric blue -> cyan
-        gradient = [91, 95, 34, 94, 96]
+        gradient = [91, 91, 95, 95, 96]
         
         lines = result.split('\n')
         nonempty = [l for l in lines if l.strip()]
