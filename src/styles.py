@@ -33,6 +33,26 @@ REVERSE = "\033[7m"
 
 RESET = "\033[0m"
 
+# =============================================================================
+# Background Colors (bg code = text code + 10)
+# =============================================================================
+
+BG_WHITE = "\033[107m"
+BG_RED = "\033[101m"
+BG_GREEN = "\033[102m"
+BG_YELLOW = "\033[103m"
+BG_BLUE = "\033[104m"
+BG_CYAN = "\033[106m"
+BG_MAGENTA = "\033[105m"
+BG_GREY = "\033[100m"
+BG_DARK_RED = "\033[41m"
+BG_DARK_GREEN = "\033[42m"
+BG_DARK_YELLOW = "\033[43m"
+BG_DARK_BLUE = "\033[44m"
+BG_DARK_MAGENTA = "\033[45m"
+BG_DARK_CYAN = "\033[46m"
+BG_BLACK = "\033[40m"
+
 
 # =============================================================================
 # Section Definitions - heading_bg, content_bg, heading_color, content_color
@@ -40,35 +60,35 @@ RESET = "\033[0m"
 
 SECTIONS = {
     "thinking": {
-        "heading_bg": GREY,
+        "heading_bg": BG_GREY,
         "heading_color": WHITE,
         "content_bg": "",
         "content_color": CYAN,
         "label": "[MIND]",
     },
     "tool": {
-        "heading_bg": MAGENTA,
+        "heading_bg": BG_MAGENTA,
         "heading_color": WHITE,
         "content_bg": "",
         "content_color": WHITE,
         "label": "[EXEC]",
     },
     "result": {
-        "heading_bg": CYAN,
+        "heading_bg": BG_CYAN,
         "heading_color": WHITE,
         "content_bg": "",
         "content_color": GREEN,
         "label": "[DATA]",
     },
     "riven": {
-        "heading_bg": "",
+        "heading_bg": BG_BLACK,
         "heading_color": CYAN,
         "content_bg": "",
         "content_color": WHITE,
         "label": "[RIVEN]",
     },
     "error": {
-        "heading_bg": GREY,
+        "heading_bg": BG_GREY,
         "heading_color": RED,
         "content_bg": "",
         "content_color": RED,
