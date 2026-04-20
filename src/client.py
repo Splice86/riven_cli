@@ -120,7 +120,6 @@ class RivenClient:
                     if line.startswith('data: '):
                         try:
                             data = json.loads(line[6:])
-                            print(f"\n[DODEBUG] keys={list(data.keys())} token={repr(data.get('token','')[:30] if data.get('token') else '')} thinking={repr(data.get('thinking','')[:30] if data.get('thinking') else '')} tool_call={data.get('tool_call') is not None} tool_result={data.get('tool_result') is not None} done={data.get('done')} ctx_rebuilt={data.get('context_rebuilt')}", flush=True)
                             
                             # Handle thinking events - always show with header
                             if 'thinking' in data:
