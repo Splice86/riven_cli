@@ -9,6 +9,7 @@ import uuid
 import yaml
 import requests
 from typing import Optional, List, Dict
+from src import styles
 
 # ANSI colors
 RED = "\033[91m"
@@ -86,37 +87,21 @@ class RivenClient:
     def stream_message(self, message: str) -> str:
         """Send message and stream response - prints tokens as they arrive.
         
-        Section headers:
-        - thinking (dim grey): reasoning from LLM
-        - tool_call (magenta): function call with args
-        - tool_result (orange): function result or error
-        - token (cyan): regular text output
+        Sections: thinking, tool, result, riven
+        See src/styles.py for color definitions.
         """
         if not self.session_id:
             raise ValueError("No session - call create_session first")
         
         import json
         
-        # ANSI colors
-        GREY = "\033[90m"
-        MAGENTA = "\033[35m"
-        ORANGE = "\033[33m"
-        CYAN = "\033[96m"
-        RESET = "\033[0m"
-        
-        # Colored backgrounds
-        BG_GREY = "\033[100m"
-        BG_MAGENTA = "\033[45m"
-        BG_ORANGE = "\033[43m"
-        BG_CYAN = "\033[46m"
-        
-        # Section header helper - colored background with text
-        def section_header(label: str, bg: str, color: str):
-            print(f"\n{bg}{color} ▸ {label.upper()} {RESET}")
-        
         # Track which sections we've shown
         shown_thinking = False
         shown_tool_call = False
+        shown_tool_result = False
+        shown_response = False
+        
+        output = ""
         shown_tool_result = False
         shown_response = False
         
@@ -144,30 +129,30 @@ class RivenClient:
                             # Handle thinking events - grey
                             if 'thinking' in data:
                                 if not shown_thinking:
-                                    section_header("thinking", BG_GREY, GREY)
+                                    print(styles.section_header("thinking"))
                                     shown_thinking = True
                                 thinking = data.get('thinking', '')
                                 if thinking and thinking.strip():
-                                    print(f"{GREY}{thinking}{RESET}", end="", flush=True)
+                                    print(styles.colored_text(thinking, styles.DIM_GREY), end="", flush=True)
                                     output += thinking
                                 continue
                             
                             # Handle tool_call events - magenta
                             if 'tool_call' in data:
                                 if not shown_tool_call:
-                                    section_header("tool", BG_MAGENTA, MAGENTA)
+                                    print(styles.section_header("tool"))
                                     shown_tool_call = True
                                 tc = data.get('tool_call', {})
                                 args_str = json.dumps(tc.get('arguments', {}), indent=2)
                                 tool_call_str = f"{tc.get('name')}({args_str})"
-                                print(f"{MAGENTA}{tool_call_str}{RESET}", end="", flush=True)
+                                print(styles.colored_text(tool_call_str, styles.TEXT_MAGENTA), end="", flush=True)
                                 output += tool_call_str
                                 continue
                             
                             # Handle tool_result events - orange
                             if 'tool_result' in data:
                                 if not shown_tool_result:
-                                    section_header("result", BG_ORANGE, ORANGE)
+                                    print(styles.section_header("result"))
                                     shown_tool_result = True
                                 tr = data.get('tool_result', {})
                                 error = tr.get('error')
@@ -176,18 +161,18 @@ class RivenClient:
                                     result_str = f"[ERROR] {error}"
                                 else:
                                     result_str = content
-                                print(f"{ORANGE}{result_str}{RESET}", end="", flush=True)
+                                print(styles.colored_text(result_str, styles.TEXT_YELLOW), end="", flush=True)
                                 output += result_str
                                 continue
-                            
-                            # Handle error events
-                            if 'error' in data:
-                                print(f"\n{RED}Error: {data['error']}{RESET}")
-                                break
                             
                             # Handle regular tokens - cyan (final response)
                             token = data.get('token', '')
                             if token:
+                                if not shown_response:
+                                    print(styles.section_header("riven"))
+                                    shown_response = True
+                                print(styles.colored_text(token, styles.TEXT_CYAN), end="", flush=True)
+                                output += token
                                 if not shown_response:
                                     section_header("riven", BG_CYAN, CYAN)
                                     shown_response = True
