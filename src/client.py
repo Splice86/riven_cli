@@ -126,7 +126,7 @@ class RivenClient:
                             if 'thinking' in data:
                                 if not shown_thinking:
                                     print(styles.section_header('thinking'))
-                                    shown_thinking = True
+                                shown_thinking = True
                                 thinking = data.get('thinking', '').strip('\n')
                                 if thinking:
                                     print(styles.section_content('thinking', thinking), end='', flush=True)
