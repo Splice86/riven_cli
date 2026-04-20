@@ -42,27 +42,32 @@ SECTIONS = {
     "thinking": {
         "label": "THINKING",
         "bg": BG_GREY,
-        "text": TEXT_WHITE,
+        "title_color": TEXT_WHITE,
+        "content_color": TEXT_WHITE,
     },
     "tool": {
         "label": "TOOL",
         "bg": BG_MAGENTA,
-        "text": TEXT_WHITE,
+        "title_color": TEXT_WHITE,
+        "content_color": TEXT_WHITE,
     },
     "result": {
         "label": "RESULT",
         "bg": BG_YELLOW,
-        "text": TEXT_RED,       # Red text on yellow for contrast
+        "title_color": TEXT_BLUE,      # Blue title on yellow
+        "content_color": TEXT_BLACK,   # Black text on yellow (readable)
     },
     "riven": {
         "label": "RIVEN",
         "bg": BG_CYAN,
-        "text": TEXT_RED,       # Red text on cyan for contrast
+        "title_color": TEXT_WHITE,
+        "content_color": TEXT_CYAN,    # Cyan content text
     },
     "error": {
         "label": "ERROR",
         "bg": BG_RED,
-        "text": TEXT_WHITE,
+        "title_color": TEXT_WHITE,
+        "content_color": TEXT_WHITE,
     },
 }
 
@@ -81,6 +86,22 @@ def section_header(name: str) -> str:
     
     section = SECTIONS[name]
     return f"\n{section['bg']}{section['text']} ▸ {section['label']} {RESET}"
+
+
+def section_header(name: str) -> str:
+    """Generate a styled section header using title_color."""
+    if name not in SECTIONS:
+        name = "thinking"
+    section = SECTIONS[name]
+    return f"\n{section['bg']}{section['title_color']} ▸ {section['label']} {RESET}"
+
+
+def section_content(name: str, text: str) -> str:
+    """Color text using section's content_color."""
+    if name not in SECTIONS:
+        name = "thinking"
+    section = SECTIONS[name]
+    return f"{section['content_color']}{text}{RESET}"
 
 
 def colored_text(text: str, color: str) -> str:

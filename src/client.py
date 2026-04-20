@@ -126,18 +126,18 @@ class RivenClient:
                         try:
                             data = json.loads(line[6:])
                             
-                            # Handle thinking events - grey
+                            # Handle thinking events
                             if 'thinking' in data:
                                 if not shown_thinking:
                                     print(styles.section_header("thinking"))
                                     shown_thinking = True
                                 thinking = data.get('thinking', '')
                                 if thinking and thinking.strip():
-                                    print(styles.colored_text(thinking, styles.DIM_GREY), end="", flush=True)
+                                    print(styles.section_content("thinking", thinking), end="", flush=True)
                                     output += thinking
                                 continue
                             
-                            # Handle tool_call events - magenta
+                            # Handle tool_call events
                             if 'tool_call' in data:
                                 if not shown_tool_call:
                                     print(styles.section_header("tool"))
@@ -145,11 +145,11 @@ class RivenClient:
                                 tc = data.get('tool_call', {})
                                 args_str = json.dumps(tc.get('arguments', {}), indent=2)
                                 tool_call_str = f"{tc.get('name')}({args_str})"
-                                print(styles.colored_text(tool_call_str, styles.TEXT_MAGENTA), end="", flush=True)
+                                print(styles.section_content("tool", tool_call_str), end="", flush=True)
                                 output += tool_call_str
                                 continue
                             
-                            # Handle tool_result events - orange
+                            # Handle tool_result events
                             if 'tool_result' in data:
                                 if not shown_tool_result:
                                     print(styles.section_header("result"))
@@ -161,17 +161,17 @@ class RivenClient:
                                     result_str = f"[ERROR] {error}"
                                 else:
                                     result_str = content
-                                print(styles.colored_text(result_str, styles.TEXT_YELLOW), end="", flush=True)
+                                print(styles.section_content("result", result_str), end="", flush=True)
                                 output += result_str
                                 continue
                             
-                            # Handle regular tokens - cyan (final response)
+                            # Handle regular tokens (final response)
                             token = data.get('token', '')
                             if token:
                                 if not shown_response:
                                     print(styles.section_header("riven"))
                                     shown_response = True
-                                print(styles.colored_text(token, styles.TEXT_CYAN), end="", flush=True)
+                                print(styles.section_content("riven", token), end="", flush=True)
                                 output += token
                                 if not shown_response:
                                     section_header("riven", BG_CYAN, CYAN)
