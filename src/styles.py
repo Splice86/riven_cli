@@ -80,7 +80,7 @@ def section_header(name: str) -> str:
     if name not in SECTIONS:
         name = "thinking"
     section = SECTIONS[name]
-    return f"\n{section['bg']}{section['title_color']} ▸ {section['label']} {RESET}"
+    return f"\n{section['bg']}{section['title_color']} ▸ {section['label']}{RESET}"
 
 
 def section_content(name: str, text: str) -> str:
