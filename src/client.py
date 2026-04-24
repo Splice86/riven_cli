@@ -22,7 +22,8 @@ SESSION_FILE = os.path.expanduser("~/.riven_session")
 
 def _load_config() -> dict:
     """Load CLI config from secrets.yaml."""
-    config_path = os.path.join(os.path.dirname(__file__), "secrets.yaml")
+    # secrets.yaml lives at project root (parent of src/), not alongside client.py
+    config_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "secrets.yaml")
     if os.path.exists(config_path):
         with open(config_path) as f:
             return yaml.safe_load(f) or {}
