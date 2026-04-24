@@ -199,6 +199,97 @@ class RivenClient:
         """Close the current session."""
         self.session_id = None
 
+    # ------------------------------------------------------------------
+    # Process management
+    # ------------------------------------------------------------------
+
+    def list_processes(self, shard_name: str = None, status: str = None) -> List[Dict]:
+        """List all processes, optionally filtered."""
+        params = {}
+        if shard_name:
+            params["shard_name"] = shard_name
+        if status:
+            params["status"] = status
+        resp = requests.get(f"{self.base_url}/processes", params=params)
+        resp.raise_for_status()
+        return resp.json().get("processes", [])
+
+    def get_process(self, process_id: str) -> Dict:
+        """Get process status."""
+        resp = requests.get(f"{self.base_url}/processes/{process_id}")
+        resp.raise_for_status()
+        return resp.json()
+
+    def get_process_output(
+        self,
+        process_id: str,
+        messages: bool = True,
+        thinking: bool = False,
+        tool_calls: bool = False,
+        tool_results: bool = False,
+        errors: bool = False,
+        last_only: bool = False,
+        since: float = None,
+    ) -> Dict:
+        """Get process output with filtering."""
+        params = {
+            "messages": messages,
+            "thinking": thinking,
+            "tool_calls": tool_calls,
+            "tool_results": tool_results,
+            "errors": errors,
+            "last_only": last_only,
+        }
+        if since is not None:
+            params["since"] = since
+        resp = requests.get(f"{self.base_url}/processes/{process_id}/output", params=params)
+        resp.raise_for_status()
+        return resp.json()
+
+    def stream_process_output(
+        self,
+        process_id: str,
+        messages: bool = True,
+        thinking: bool = False,
+        tool_calls: bool = False,
+        tool_results: bool = False,
+        errors: bool = False,
+    ) -> str:
+        """Stream process output as SSE."""
+        params = {
+            "messages": messages,
+            "thinking": thinking,
+            "tool_calls": tool_calls,
+            "tool_results": tool_results,
+            "errors": errors,
+        }
+        return process_id, params  # caller uses with requests.get(..., stream=True)
+
+    def send_process_message(self, process_id: str, message: str) -> Dict:
+        """Send a message to a process."""
+        resp = requests.post(
+            f"{self.base_url}/processes/{process_id}/input",
+            json={"message": message},
+        )
+        resp.raise_for_status()
+        return resp.json()
+
+    def stop_process(self, process_id: str) -> Dict:
+        """Stop a running process."""
+        resp = requests.delete(f"{self.base_url}/processes/{process_id}")
+        resp.raise_for_status()
+        return resp.json()
+
+    def cleanup_process(self, process_id: str) -> Dict:
+        """Remove a done/stopped process."""
+        resp = requests.delete(f"{self.base_url}/processes/{process_id}/cleanup")
+        resp.raise_for_status()
+        return resp.json()
+
+    def close_session(self) -> None:
+        """Close the current session."""
+        self.session_id = None
+
     def resume_session(self, shard_name: str = None) -> Optional[Dict]:
         """Try to resume a saved session."""
         saved_id = self.load_session()
